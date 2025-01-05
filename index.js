@@ -1,13 +1,13 @@
 // Require the necessary discord.js classes
 const fs = require('node:fs'); // identify command files
 const path = require('node:path'); // constructs paths to access files and directories
-const { ActivityType, Client, Collection, Events, GatewayIntentBits } = require('discord.js');
-const { token } = require('./config.json');
-const { sleep } = require('./exports/helperMethods');
-const { REST, Routes, DataResolver } = require("discord.js");
+const { ActivityType, Client, Collection, GatewayIntentBits, Partials } = require('discord.js');
+const { token, DM_CHANNEL_ID } = require('./config.json');
 
 // Create a new client instance
-const client = new Client({ intents: [GatewayIntentBits.Guilds] });
+const client = new Client({ 
+	intents: [GatewayIntentBits.Guilds, 'DirectMessages'], 
+	partials: [Partials.Channel] });
 
 client.commands = new Collection();
 
@@ -54,6 +54,7 @@ client.cooldowns = new Collection();
 client.login(token);
 
 // Setting bot details
+// const { REST, Routes, DataResolver } = require("discord.js");
 // const rest = new REST().setToken(token);
 
 // const updateBanner = async function (bannerLink) {
@@ -70,6 +71,14 @@ client.login(token);
 client.on("ready", () => {
 	client.user.setActivity('most retarded competition', { type: ActivityType.Competing });
 	// updateBanner('https://i.imgur.com/zuezb5Z.png'); // https://i.imgur.com/zuezb5Z.png;
+});
+
+client.on("messageCreate", async message => {
+	if (message.author.id != '1304832313556865106') {
+		const dmChannel = await client.channels.fetch(DM_CHANNEL_ID);
+		dmChannel.send({ content: `**${message.author.username} (ID: ${message.author.id}):**`});
+		dmChannel.send({ content: message.content })
+	}
 });
 
 console.log('-- Login successful')

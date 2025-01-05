@@ -7,7 +7,13 @@ module.exports = {
 	async execute(interaction) {
         // Logging command
         const logChannel = await interaction.client.channels.fetch(LOG_CHANNEL_ID);
-        logChannel.send({content: `User ${interaction.member.user.globalName} (ID: ${interaction.member.user.id}) used command ${interaction.commandName} in server ${interaction.guild.name} (ID: ${interaction.guild.id})`});
+
+        if (interaction.member != null) {
+            logChannel.send({content: `User ${interaction.member.user.username} (ID: ${interaction.member.user.id}) used command ${interaction.commandName} in server ${interaction.guild.name} (ID: ${interaction.guild.id})`});
+        }
+        else { // DMs
+            logChannel.send({content: `User ${interaction.user.username} (ID: ${interaction.user.id}) used command ${interaction.commandName} in DMs`});
+        }
 
         // Handling modals
         if (interaction.isModalSubmit()) {
@@ -25,9 +31,14 @@ module.exports = {
 		if (interaction.isChatInputCommand()) {
         const command = interaction.client.commands.get(interaction.commandName);
 
-        // Checks if commande exists in the client.commands Collection
+        // Checks if command exists in the client.commands Collection
         if (!command) {
             console.error(`No command matching ${interaction.commandName} was found.`);
+            return;
+        }
+
+        if (interaction.commandName.startsWith('o-') && interaction.user.id != ADMIN_ID) {
+            await interaction.reply({ content: 'Only bot admin can use this command!', ephemeral: true })
             return;
         }
 
