@@ -23,7 +23,15 @@ module.exports = {
         const message = interaction.options.getString('message') ?? null;
 
 		const user = interaction.client.users.cache.find((user) => user.id === userID);
-		const userDisplayName = user.displayName;
+
+		var userDisplayName = ''
+
+		if (user != null) {
+			userDisplayName = user.displayName;
+		}
+		else { // user was not cached
+			userDisplayName = userID
+		}
 
 		interaction.client.users.send(userID, message);
 
