@@ -1,12 +1,12 @@
 // Require the necessary discord.js classes
 const fs = require('node:fs'); // identify command files
 const path = require('node:path'); // constructs paths to access files and directories
-const { ActivityType, Client, Collection, GatewayIntentBits, Partials } = require('discord.js');
-const { token, DM_CHANNEL_ID, ADMIN_ID } = require('./config.json');
+const { ActivityType, Client, Collection, GatewayIntentBits, Partials, ChannelType } = require('discord.js');
+const { token, DM_CHANNEL_ID, BOT_USER_ID, TEMP_ID_1, TEMP_ID_2 } = require('./config.json');
 
 // Create a new client instance
 const client = new Client({ 
-	intents: [GatewayIntentBits.Guilds, 'DirectMessages'], 
+	intents: [GatewayIntentBits.Guilds, 'DirectMessages', 'GuildMessages', GatewayIntentBits.MessageContent], 
 	partials: [Partials.Channel] });
 
 client.commands = new Collection();
@@ -74,10 +74,20 @@ client.on("ready", () => {
 });
 
 client.on("messageCreate", async message => {
-	if (message.author.id != '1304832313556865106') {
+	if (message.author.id != BOT_USER_ID && message.channel.type == ChannelType.DM) {
 		const dmChannel = await client.channels.fetch(DM_CHANNEL_ID);
 		dmChannel.send({ content: `**${message.author.username} (ID: ${message.author.id}):**`});
-		dmChannel.send({ content: message.content })
+		dmChannel.send({ content: message.content });
+	}
+	if (message.author.id == TEMP_ID_1) {
+		const tempChannel = await client.channels.fetch(TEMP_ID_2);
+		tempChannel.send({ content: message.content });
+		message.channel.send(`Sent message successfully!`);
+	}
+	if (message.channel.id == TEMP_ID_2 && message.author.id != BOT_USER_ID) {
+		const sendId = TEMP_ID_1;
+		await message.client.users.send(sendId, message.content);
+		message.channel.send(`Sent message successfully!`);
 	}
 });
 
