@@ -1,7 +1,7 @@
 const { SlashCommandBuilder } = require('discord.js');
+const fs = require('node:fs'); // identify command files
 const { EASY_CD } = require('../../config.json');
 const { request } = require('undici');
-const { ConnectTimeoutError } = require('../../node_modules/undici/lib/core/errors')
 
 module.exports = {
     cooldown: EASY_CD,
@@ -12,9 +12,11 @@ module.exports = {
         await interaction.deferReply();
         try {
         // Send GET request to API
-        const catResult = await request('http://aws.random.cat/meow');
-		const { file } = await catResult.body.json();
-		interaction.editReply({ files: [file] });
+        const catResult = await request('https://cataas.com/cat');
+		const file = await catResult.body.blob();
+        const arrayBuffer = await file.arrayBuffer();
+        const buffer = Buffer.from(arrayBuffer);
+		interaction.editReply({ files: [{ attachment: buffer }] });
         } catch (error) {
             interaction.editReply("API is down, no cat photo")
         }

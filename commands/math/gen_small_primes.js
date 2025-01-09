@@ -8,7 +8,7 @@ module.exports = {
     cooldown: MEDIUM_CD,
 	data: new SlashCommandBuilder()
 		.setName('gen_small_primes')
-		.setDescription('Generates small primes up to limit 2 <= n <= 3000')
+		.setDescription('Generates small primes up to limit 2 <= n <= 9970')
 		.addIntegerOption(option =>
 			option.setName('n')
 				.setDescription('integer')

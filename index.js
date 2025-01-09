@@ -2,7 +2,7 @@
 const fs = require('node:fs'); // identify command files
 const path = require('node:path'); // constructs paths to access files and directories
 const { ActivityType, Client, Collection, GatewayIntentBits, Partials } = require('discord.js');
-const { token, DM_CHANNEL_ID } = require('./config.json');
+const { token, DM_CHANNEL_ID, ADMIN_ID } = require('./config.json');
 
 // Create a new client instance
 const client = new Client({ 
