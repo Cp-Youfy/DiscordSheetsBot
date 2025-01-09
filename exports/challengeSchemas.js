@@ -59,6 +59,9 @@ const flagSchema = new mongoose.Schema({
         },
         byChallengeID(challengeID) {
             return this.where({challengeID: challengeID})
+        },
+        byFlag(flag) {
+            return this.where({flag: flag})
         }
     } });
 
