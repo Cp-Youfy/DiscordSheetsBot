@@ -5,7 +5,7 @@ const { addEntry } = require('../../exports/sheetMethods.js');
 module.exports = {
     cooldown: MEDIUM_CD,
 	data: new SlashCommandBuilder()
-		.setName('add-entry')
+		.setName('o-add-entry')
 		.setDescription('Adds an entry to the Google Sheets')
         .addStringOption(option =>
 			option.setName('word')

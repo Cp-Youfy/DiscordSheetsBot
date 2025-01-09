@@ -4,7 +4,7 @@ const { EASY_CD } = require('../../config.json');
 module.exports = {
     cooldown: EASY_CD,
 	data: new SlashCommandBuilder()
-		.setName('add-entry-m')
+		.setName('o-add-entry-m')
 		.setDescription('Adds an entry to the Google Sheets (modal)'),
 		
 	async execute(interaction) {

@@ -5,7 +5,7 @@ const { cacheJson } = require('../../exports/sheetMethods.js');
 module.exports = {
     cooldown: HARD_CD,
 	data: new SlashCommandBuilder()
-		.setName('cache-json')
+		.setName('o-cache-json')
 		.setDescription('Cache sheets results locally'),
     
 	async execute(interaction) {

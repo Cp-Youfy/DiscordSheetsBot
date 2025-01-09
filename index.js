@@ -69,7 +69,7 @@ client.login(token);
 // }
 
 client.on("ready", () => {
-	client.user.setActivity('most retarded competition', { type: ActivityType.Competing });
+	client.user.setActivity('sexiest cats 2025 championship', { type: ActivityType.Competing });
 	// updateBanner('https://i.imgur.com/zuezb5Z.png'); // https://i.imgur.com/zuezb5Z.png;
 });
 
