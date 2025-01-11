@@ -13,19 +13,19 @@ module.exports = {
                 .setRequired(true),
             ),	
 	async execute(interaction) {
-        await interaction.reply("Command under maintenance");
-        return;
+        // await interaction.reply("Command under maintenance");
+        // return;
         try {
             const nameString = interaction.options.getString('name') ?? null;
-            const res = registerUser(interaction.user.id, nameString, Date.now());
+            const res = await registerUser(interaction.user.id, nameString, Date.now());
             await interaction.reply(res);
             return;
-        } catch (exception) {
-            if (exception == "Player already exists") {
+        } catch (error) {
+            if (error.message == "Player already exists") {
                 await interaction.reply("You have already registered!");
                 return;
             } else {
-                throw exception(exception);
+                throw error;
             }
         }
 	},

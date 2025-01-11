@@ -16,10 +16,10 @@ const challengeParticipationSchema = new mongoose.Schema({
     collection: 'challengeParticipation',
     query: {
         byChallengeID(challengeID) {
-            return this.where({ challengeID: challengeID })
+            return this.where({ challengeID: challengeID });
         },
         byPlayerID(playerID) {
-            return this.where({ playerID: playerID })
+            return this.where({ playerID: playerID });
         }
     } });
 
@@ -38,10 +38,10 @@ const flagsObtainedSchema = new mongoose.Schema({
     query: {
         byUniqueID(uniqueID) {
             const [challengeID, flagID] = uniqueID.split('_');
-            return this.where({ challengeID: challengeID, flagID: flagID })
+            return this.where({ challengeID: challengeID, flagID: flagID });
         },
         byPlayerID(playerID) {
-            return this.where({ playerID: playerID })
+            return this.where({ playerID: playerID });
         }
     }
  });
@@ -55,31 +55,52 @@ const flagSchema = new mongoose.Schema({
     collection: 'flags',
     query: {
         byValue(value) {
-            return this.where({ value: value })
+            return this.where({ value: value });
         },
         byChallengeID(challengeID) {
-            return this.where({challengeID: challengeID})
+            return this.where({ challengeID: challengeID });
         },
         byFlag(flag) {
-            return this.where({flag: flag})
+            return this.where({ flag: flag });
         }
     } });
 
 flagSchema.methods.getUniqueID = function getUniqueID() {
-    const uniqueID = this.challengeID + '_' + this.flagID
+    const uniqueID = this.challengeID + '_' + this.flagID;
     return uniqueID
 };
+
+const scoreboardSchema = new mongoose.Schema({
+    challengeID: String,
+    playerID: String,
+    scoreValue: Number
+}, {
+    collection: 'scoreboard',
+    query: {
+        byUniqueID(uniqueID) {
+            const [challengeID, playerID] = uniqueID.split('_');
+            return this.where({ challengeID: challengeID, playerID: playerID });
+        }
+    }
+});
+
+scoreboardSchema.methods.getUniqueID = function getUniqueID() {
+    const uniqueID = this.challengeID + '_' + this.playerID;
+    return uniqueID
+}
 
 const Challenge = mongoose.model('Challenge', challengeSchema);
 const ChallengeParticipation = mongoose.model('challengeParticipation', challengeParticipationSchema);
 const Player = mongoose.model('Player', playerSchema);
 const FlagsObtained = mongoose.model('FlagsObtained', flagsObtainedSchema);
 const Flag = mongoose.model('Flag', flagSchema);
+const Scoreboard = mongoose.model('Scoreboard', scoreboardSchema);
 
 module.exports = {
     Challenge: Challenge,
     ChallengeParticipation: ChallengeParticipation,
     Player: Player,
     FlagsObtained: FlagsObtained,
-    Flag: Flag
+    Flag: Flag, 
+    Scoreboard: Scoreboard
 }
