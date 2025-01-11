@@ -21,7 +21,7 @@ module.exports = {
             await interaction.reply(res);
             return;
         } catch (error) {
-            if (error.message == "Player already exists") {
+            if (error.message == "Player already exists.") {
                 await interaction.reply("You have already registered!");
                 return;
             } else {

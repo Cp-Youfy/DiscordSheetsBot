@@ -1,17 +1,18 @@
 const mongoose = require('mongoose');
 
 const challengeSchema = new mongoose.Schema({
-    name: String,
-    organiser: String,
-    startDate: Date,
-    duration: Number, // in seconds
-    isHiddenID: Boolean,
-    longAnsChannelID: String || null
+    name: { type: String, required: true },
+    organiser: { type: String, required: true }, // user ID of organiser to allow for them to modify the challenge
+    startDate: { type: Date, required: true },
+    duration: { type: Number, required: true }, // in seconds
+    isHiddenID: { type: Boolean, required: true },
+    longAnsChannelID: { type: String || null, required: true },
+    dateCreated: { type: Date, required: true }
 }, { collection: 'challenges' });
 
 const challengeParticipationSchema = new mongoose.Schema({
-    challengeID: String,
-    playerID: String
+    challengeID: { type: String, required: true },
+    playerID: { type: String, required: true }
 }, { 
     collection: 'challengeParticipation',
     query: {
@@ -24,15 +25,15 @@ const challengeParticipationSchema = new mongoose.Schema({
     } });
 
 const playerSchema = new mongoose.Schema({
-    _id: String,
-    name: String,
-    registrationDate: String
+    _id: { type: String, required: true },
+    name: { type: String, required: true },
+    registrationDate: { type: String, required: true }
 }, { collection: 'players' });
 
 const flagsObtainedSchema = new mongoose.Schema({
-    playerID: String,
-    challengeID: String,
-    flagID: String
+    playerID: { type: String, required: true },
+    challengeID: { type: String, required: true },
+    flagID: { type: String, required: true }
 }, { 
     collection: 'flagsObtained',
     query: {
@@ -47,10 +48,10 @@ const flagsObtainedSchema = new mongoose.Schema({
  });
 
 const flagSchema = new mongoose.Schema({
-    challengeID: String,
-    flagID: String,
-    flag: String,
-    value: Number
+    challengeID: { type: String, required: true },
+    flagID: { type: String, required: true },
+    flag: { type: String, required: true },
+    value: { type: Number, required: true }
 }, { 
     collection: 'flags',
     query: {
@@ -71,9 +72,9 @@ flagSchema.methods.getUniqueID = function getUniqueID() {
 };
 
 const scoreboardSchema = new mongoose.Schema({
-    challengeID: String,
-    playerID: String,
-    scoreValue: Number
+    challengeID: { type: String, required: true },
+    playerID: { type: String, required: true },
+    scoreValue: { type: Number, required: true }
 }, {
     collection: 'scoreboard',
     query: {

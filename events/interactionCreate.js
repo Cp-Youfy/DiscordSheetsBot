@@ -1,6 +1,7 @@
 const { Collection, Events } = require('discord.js');
 const { EASY_CD, ADMIN_ID, LOG_CHANNEL_ID } = require('../config.json');
 const { addEntry } = require('../exports/sheetMethods.js');
+const { createChallenge, joinChallenge } = require('../exports/databaseMethods.js')
 
 module.exports = {
 	name: Events.InteractionCreate,
@@ -17,13 +18,34 @@ module.exports = {
 
         // Handling modals
         if (interaction.isModalSubmit()) {
-            if (interaction.customId === 'wordEntryModal') {
-                const wordStr = interaction.fields.getTextInputValue('wordInput');
-                const definitionStr = interaction.fields.getTextInputValue('definitionInput');
+            try {
+                if (interaction.customId === 'wordEntryModal') {
+                    const wordStr = interaction.fields.getTextInputValue('wordInput');
+                    const definitionStr = interaction.fields.getTextInputValue('definitionInput');
 
-                res = await addEntry(wordStr, definitionStr);
-                await interaction.reply(res);
-                return;
+                    res = await addEntry(wordStr, definitionStr);
+                    await interaction.reply(res);
+                    return;
+                }
+                if (interaction.customId === 'createChallengeModal') {
+                    const name = interaction.fields.getTextInputValue('nameInput');
+                    const organiser = interaction.fields.getTextInputValue('organiserInput');
+                    const startDate = interaction.fields.getTextInputValue('startDateInput');
+                    const duration = interaction.fields.getTextInputValue('durationInput');
+                    const longAnsChannelID = interaction.fields.getTextInputValue('longAnsChannelIDInput');
+
+                    res = await createChallenge(name, organiser, startDate, duration, longAnsChannelID);
+                    await interaction.reply(res)
+                    return;
+                }
+            } catch (err) {
+                console.error(err);
+                logChannel.send({content: `**ERROR [MODAL]** (${interaction.commandName}) | ${err}`});
+                if (interaction.replied || interaction.deferred) {
+                    await interaction.followUp({ content: 'There was an error while processing this modal!', ephemeral: true });
+                } else {
+                    await interaction.reply({ content: 'There was an error while processing this modal!', ephemeral: true });
+                }
             }
         }
 
@@ -77,7 +99,11 @@ module.exports = {
             await command.execute(interaction);
         } catch (error) {
             console.error(error);
-            logChannel.send({content: `**ERROR** (${interaction.commandName}) | ${error}`});
+            if (error.message == "BotOwnerOnly") {
+                await interaction.reply({ content: 'Only bot admin can use this command!', ephemeral: true })
+                return;
+            }
+            logChannel.send({content: `**ERROR [COMMAND]** (${interaction.commandName}) | ${error}`});
             if (interaction.replied || interaction.deferred) {
                 await interaction.followUp({ content: 'There was an error while executing this command!', ephemeral: true });
             } else {
