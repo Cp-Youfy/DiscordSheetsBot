@@ -2,7 +2,7 @@
 const fs = require('node:fs'); // identify command files
 const path = require('node:path'); // constructs paths to access files and directories
 const { ActivityType, Client, Collection, GatewayIntentBits, Partials, ChannelType } = require('discord.js');
-const { token, DM_CHANNEL_ID, BOT_USER_ID, TEMP_ID_1, TEMP_ID_2 } = require('./config.json');
+const { token, DM_CHANNEL_ID, BOT_USER_ID } = require('./config.json');
 
 // Create a new client instance
 const client = new Client({ 
@@ -78,16 +78,6 @@ client.on("messageCreate", async message => {
 		const dmChannel = await client.channels.fetch(DM_CHANNEL_ID);
 		dmChannel.send({ content: `**${message.author.username} (ID: ${message.author.id}):**`});
 		dmChannel.send({ content: message.content });
-	}
-	if (message.author.id == TEMP_ID_1) {
-		const tempChannel = await client.channels.fetch(TEMP_ID_2);
-		tempChannel.send({ content: message.content });
-		message.channel.send(`Sent message successfully!`);
-	}
-	if (message.channel.id == TEMP_ID_2 && message.author.id != BOT_USER_ID) {
-		const sendId = TEMP_ID_1;
-		await message.client.users.send(sendId, message.content);
-		message.channel.send(`Sent message successfully!`);
 	}
 });
 

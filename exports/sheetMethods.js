@@ -21,7 +21,7 @@ function addEntry(wordStr, definitionStr) {
     }
 
     axios.post(SHEETS_API_LINK, {
-        data: {
+        data: { // the headers of your google sheets should match the keys of this dictionary
             word: wordStr,
             definition: definitionStr
         }
