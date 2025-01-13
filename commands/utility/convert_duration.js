@@ -1,13 +1,9 @@
-const spacetime = require('spacetime')
-const assert = require('assert')
-
 const { SlashCommandBuilder } = require('discord.js');
 const { EASY_CD } = require('../../config.json');
-const { type } = require('os');
 
 function getSeconds(str, resultType) {
     if (resultType == 's' || resultType == 'seconds') { fac = 60 }
-    else if (resultType == 'ms' || resultType == 'milliseconds') { fac = 600 }
+    else if (resultType == 'ms' || resultType == 'milliseconds') { fac = 60000 }
     else { return 'Invalid result type.' }
     // src: https://stackoverflow.com/a/11909592
     var seconds = 0;

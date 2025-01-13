@@ -125,6 +125,6 @@ module.exports = {
             timestamp: new Date().toISOString(),
         };
         
-        await interaction.reply({ embeds: [embed]});
+        await interaction.reply({ embeds: [embed] });
 	},
 };

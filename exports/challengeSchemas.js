@@ -7,12 +7,20 @@ const challengeSchema = new mongoose.Schema({
     duration: { type: Number, required: true }, // in seconds
     isHiddenID: { type: Boolean, required: true },
     longAnsChannelID: { type: String || null, required: true },
+    isOpen: { type: Boolean, required: true }, // whether the competition can be joined; default to false
     dateCreated: { type: Date, required: true }
-}, { collection: 'challenges' });
+}, { collection: 'challenges',
+    query: {
+        challengeNameToID(challengeName) {
+            return this.id.where({ challengeName: challengeName })
+        }
+    }
+ });
 
 const challengeParticipationSchema = new mongoose.Schema({
     challengeID: { type: String, required: true },
-    playerID: { type: String, required: true }
+    playerID: { type: String, required: true },
+    dateCreated: { type: Date, required: true }
 }, { 
     collection: 'challengeParticipation',
     query: {
@@ -25,15 +33,17 @@ const challengeParticipationSchema = new mongoose.Schema({
     } });
 
 const playerSchema = new mongoose.Schema({
-    _id: { type: String, required: true },
+    id: { type: String, required: true }, // String, not ObjectId
     name: { type: String, required: true },
-    registrationDate: { type: String, required: true }
+    registrationDate: { type: String, required: true },
+    dateCreated: { type: Date, required: true }
 }, { collection: 'players' });
 
 const flagsObtainedSchema = new mongoose.Schema({
     playerID: { type: String, required: true },
     challengeID: { type: String, required: true },
-    flagID: { type: String, required: true }
+    flagID: { type: String, required: true },
+    dateCreated: { type: Date, required: true }
 }, { 
     collection: 'flagsObtained',
     query: {
@@ -54,10 +64,12 @@ const flagSchema = new mongoose.Schema({
     flagTitle: { type: String, required: true }, // question title
     flagInfo: { type: String, required: true }, // question information
     isLongAns: { type: Boolean, required: false }, // long answer format (Challenge.longAnsChannelID? takes precedence!)
-    value: { type: Number, required: true }
+    value: { type: Number, required: true },
+    dateCreated: { type: Date, required: true }
 }, { 
     collection: 'flags',
     query: {
+        // use a combination of challengeID and flag to check for flags rather than byFlag() to avoid cross-referencing challenges
         byValue(value) {
             return this.where({ value: value });
         },
@@ -80,7 +92,8 @@ flagSchema.methods.getUniqueID = function getUniqueID() {
 const scoreboardSchema = new mongoose.Schema({
     challengeID: { type: String, required: true },
     playerID: { type: String, required: true },
-    scoreValue: { type: Number, required: true }
+    scoreValue: { type: Number, required: true },
+    dateCreated: { type: Date, required: true }
 }, {
     collection: 'scoreboard',
     query: {

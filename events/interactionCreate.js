@@ -97,11 +97,11 @@ module.exports = {
         try {
             await command.execute(interaction);
         } catch (error) {
-            console.error(error);
             if (error.message == "BotOwnerOnly") {
                 await interaction.reply({ content: 'Only bot admin can use this command!', ephemeral: true })
                 return;
             }
+            console.error(error);
             logChannel.send({content: `**ERROR [COMMAND]** (${interaction.commandName}) | ${error}`});
             if (interaction.replied || interaction.deferred) {
                 await interaction.followUp({ content: 'There was an error while executing this command!', ephemeral: true });
