@@ -145,6 +145,7 @@ module.exports = {
             return;
         }
         else if (option == 'help') {
+            // NOTE: TODO help for individual params
             paramsArr = [
                 {
                     name: 'create',
@@ -171,7 +172,6 @@ module.exports = {
             var embed = {
                 color: 0x0099ff,
                 title: 'Help',
-                description: 'For help about a certain option, set `param1 = <option>`',
                 timestamp: new Date().toISOString(),
             };
             
