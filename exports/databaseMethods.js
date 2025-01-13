@@ -144,7 +144,7 @@ async function findChallenge(param) {
     await mongoose.connect(uri);
     // first search by id
     try {
-        const paramAsObjectId = new ObjectId(param)
+        const paramAsObjectId = new ObjectId(param);
         const challengeById = await Challenge.findById(paramAsObjectId);
         const multipleChallengesErrMsg = "Unexpected behaviour: Multiple challenges found (findChallenge)."
 
@@ -161,7 +161,8 @@ async function findChallenge(param) {
         } else if (challengeById.length > 1) {
             throw new Error(multipleChallengesErrMsg)
         } else {
-            return challengeById[0]
+            // 0th index not required -- recall id is unique so findById returns only one document
+            return challengeById
         }
     } catch (err) {
         // id string is not even valid
