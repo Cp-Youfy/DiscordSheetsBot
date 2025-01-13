@@ -7,7 +7,7 @@ const { EASY_CD } = require('../../config.json');
 module.exports = {
     cooldown: EASY_CD,
 	data: new SlashCommandBuilder()
-		.setName('conv_timezone')
+		.setName('conv-timezone')
 		.setDescription('String to Discord Timestamp')
 		.addStringOption(option =>
 			option.setName('timezone_string')

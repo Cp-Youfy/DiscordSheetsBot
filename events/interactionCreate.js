@@ -33,14 +33,13 @@ module.exports = {
                     const startDate = interaction.fields.getTextInputValue('startDateInput');
                     const duration = interaction.fields.getTextInputValue('durationInput');
                     const longAnsChannelID = interaction.fields.getTextInputValue('longAnsChannelIDInput');
-
-                    res = await createChallenge(name, organiser, startDate, duration, longAnsChannelID);
+                    const res = await createChallenge(name, organiser, startDate, duration, longAnsChannelID);
                     await interaction.reply(res)
                     return;
                 }
             } catch (err) {
                 console.error(err);
-                logChannel.send({content: `**ERROR [MODAL]** (${interaction.commandName}) | ${err}`});
+                logChannel.send({content: `**ERROR [MODAL]** (${interaction.customId}) | ${err}`});
                 if (interaction.replied || interaction.deferred) {
                     await interaction.followUp({ content: 'There was an error while processing this modal!', ephemeral: true });
                 } else {

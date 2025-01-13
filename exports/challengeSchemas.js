@@ -3,7 +3,7 @@ const mongoose = require('mongoose');
 const challengeSchema = new mongoose.Schema({
     name: { type: String, required: true },
     organiser: { type: String, required: true }, // user ID of organiser to allow for them to modify the challenge
-    startDate: { type: Date, required: true },
+    startDate: { type: Date, required: true }, // stored in UTC (-0000)
     duration: { type: Number, required: true }, // in seconds
     isHiddenID: { type: Boolean, required: true },
     longAnsChannelID: { type: String || null, required: true },
@@ -51,6 +51,9 @@ const flagSchema = new mongoose.Schema({
     challengeID: { type: String, required: true },
     flagID: { type: String, required: true },
     flag: { type: String, required: true },
+    flagTitle: { type: String, required: true }, // question title
+    flagInfo: { type: String, required: true }, // question information
+    isLongAns: { type: Boolean, required: false }, // long answer format (Challenge.longAnsChannelID? takes precedence!)
     value: { type: Number, required: true }
 }, { 
     collection: 'flags',
@@ -63,7 +66,10 @@ const flagSchema = new mongoose.Schema({
         },
         byFlag(flag) {
             return this.where({ flag: flag });
-        }
+        },
+        byTitle(flagTitle) {
+            return this.where({ flagTitle: flagTitle })
+        },
     } });
 
 flagSchema.methods.getUniqueID = function getUniqueID() {

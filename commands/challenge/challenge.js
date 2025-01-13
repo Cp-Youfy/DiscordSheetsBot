@@ -51,7 +51,7 @@ module.exports = {
             const duration = new TextInputBuilder()
                 .setCustomId('durationInput')
                 .setLabel("Duration (ms)")
-                .setPlaceholder("Use convert-duration command if needed")
+                .setPlaceholder("Use conv-duration command if needed")
                 .setRequired(true)
                 .setStyle(TextInputStyle.Short);
             
