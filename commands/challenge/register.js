@@ -13,8 +13,6 @@ module.exports = {
                 .setRequired(true),
             ),	
 	async execute(interaction) {
-        // await interaction.reply("Command under maintenance");
-        // return;
         try {
             const nameString = interaction.options.getString('name') ?? null;
             const res = await registerUser(interaction.user.id, nameString, Date.now());
