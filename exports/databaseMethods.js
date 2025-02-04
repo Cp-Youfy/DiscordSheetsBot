@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 const { ObjectId } = require('mongodb');
 const { inlineCode } = require('discord.js');
 const assert = require('assert');
-const { DATABASE_USERNAME, DATABASE_PASSWORD, DATABASE_NAME } = require('../config.json');
+const { DATABASE_USERNAME, DATABASE_PASSWORD, DATABASE_NAME, DEFAULT_CHANNEL_LOG_ID } = require('../config.json');
 const { Challenge, ChallengeParticipation, Player, FlagsObtained, Flag, Scoreboard } = require('./challengeSchemas.js');
 
 const uri = `mongodb+srv://${DATABASE_USERNAME}:${DATABASE_PASSWORD}@challenge.g4x9t.mongodb.net/${DATABASE_NAME}?retryWrites=true&w=majority&appName=challenge`;
@@ -39,8 +39,8 @@ async function joinChallenge(challengeID, discordID) {
 
     const dateCreated = new Date();
     const existingPlayer = await ChallengeParticipation.find({ challengeID: challengeID, playerID: discordID })
-    const challengeIdAsObjectId = new ObjectId(challengeID)
-    const isOpen = await Challenge.findById(challengeIdAsObjectId).isOpen
+    const challenge = await findChallenge(challengeID) // throws error if not found
+    const isOpen = await challenge.isOpen
     if (existingPlayer.length != 0) {
         throw new Error("Player has already joined the specified challenge.");
     } else if (!isOpen) {
@@ -73,7 +73,7 @@ async function createChallenge(name, organiser, startDate, duration, longAnsChan
         await mongoose.connect(uri);
         // isHiddenID will be default set to true and can be changed with the modify command
         // it is not in the modal due to the numFields <= 5 Discord API restriction
-        const challenge = new Challenge({ name: name, organiser: organiser, startDate: inputStartDate, duration: inputDuration, isHiddenID: true, longAnsChannelID: longAnsChannelID, isOpen: false, dateCreated: dateCreated });
+        const challenge = new Challenge({ name: name, organiser: organiser, startDate: inputStartDate, duration: inputDuration, isHiddenID: true, longAnsChannelID: longAnsChannelID, isOpen: false, dateCreated: dateCreated, logChannelID: DEFAULT_CHANNEL_LOG_ID });
 
         // While name is not the primary key, we want to avoid duplicate names for challenges to avoid confusion
         const existingChallenge = await Challenge.find({ name: name });

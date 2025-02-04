@@ -8,7 +8,8 @@ const challengeSchema = new mongoose.Schema({
     isHiddenID: { type: Boolean, required: true },
     longAnsChannelID: { type: String || null, required: true },
     isOpen: { type: Boolean, required: true }, // whether the competition can be joined; default to false
-    dateCreated: { type: Date, required: true }
+    dateCreated: { type: Date, required: true },
+    logChannelID: {type: String || null, required: true}
 }, { collection: 'challenges',
     query: {
         challengeNameToID(challengeName) {

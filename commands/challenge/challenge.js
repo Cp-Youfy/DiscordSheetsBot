@@ -1,6 +1,7 @@
 const { SlashCommandBuilder, ActionRowBuilder, ModalBuilder, TextInputBuilder, TextInputStyle } = require('discord.js');
 const { HARD_CD, ADMIN_ID } = require('../../config.json');
-const { findChallenge } = require('../../exports/databaseMethods.js')
+const assert = require('assert');
+const { findChallenge, joinChallenge } = require('../../exports/databaseMethods.js')
 const { ObjectId } = require('mongodb')
 
 module.exports = {
@@ -22,11 +23,17 @@ module.exports = {
             option.setName('param2')
                 .setDescription('required for some options')
                 .setRequired(false),
+            )
+        .addStringOption(option =>
+            option.setName('param3')
+                .setDescription('required for some options')
+                .setRequired(false),
             ),	
 	async execute(interaction) {
         const option = interaction.options.getString('option') ?? null;
         const param1 = interaction.options.getString('param1') ?? null;
         const param2 = interaction.options.getString('param2') ?? null;
+        const param3 = interaction.options.getString('param3') ?? null;
         if (option == 'create') {
             if (interaction.user.id != ADMIN_ID) {
                 // Handled under interactionCreate.js
@@ -91,8 +98,46 @@ module.exports = {
             await interaction.showModal(modal);
         }
         else if (option == 'modify') {
-            await interaction.reply("WIP");
-            return;
+            if (param1 == null) {
+                await interaction.reply("A challenge ID must be specified (case sensitive). You can find the challenge ID by displaying the challenge using `challenge display`.");
+                return;
+            }
+            if (param2 == null) {
+                await interaction.reply("A field must be specified (case sensitive).");
+                return;
+            }
+            if (param3 == null) {
+                await interaction.reply("A value must be specified (case sensitive).");
+                return;
+            }
+            try {
+                const challenge = await findChallenge(param1);
+                if (interaction.user.id != challenge.prganiser && interaction.user.id != ADMIN_ID) {
+                    await interaction.reply("Only the challenge organiser or bot owner can modify challenge fields.");
+                    return;
+                }
+                const field = param2;
+                if (!(['name', 'organiser', 'startDate', 'duration', 'isHiddenID', 'longAnsChannelID', 'isOpen', 'logChannelID'].includes(field))) {
+                    await interaction.reply("Invalid field specified. See `<field>` section for allowed fields and ensure case is accurate.");
+                    return;
+                }
+
+                const value = param3;
+                challenge[field] = value;
+                
+                await challenge.save();
+                await interaction.reply("Field changed successfully.");
+                return;
+
+            } catch (err) {
+                if (err.message == "Challenge not found." || err.message == "Field was not updated correctly.") {
+                    await interaction.reply(err.message);
+                    return;
+                } else {
+                    // Default error handling behaviour for unexpected errors
+                    throw new Error(err.message);
+                }
+            }
         }
         else if (option == 'display') {
             if (param1 == null) {
@@ -121,6 +166,7 @@ module.exports = {
                     **longAnsChannelID** ${challenge.longAnsChannelID}
                     **isOpen** ${challenge.isOpen}
                     **dateCreated** ${challenge.dateCreated}
+                    **logChannelID** ${challenge.logChannelID}
                     `,
                     footer: {
                         text: '❓ Use `/challenge help` for details on each field.'
@@ -141,8 +187,24 @@ module.exports = {
             }
         }
         else if (option == 'join') {
-            await interaction.reply("WIP");
-            return;
+            if (param1 == null) {
+                await interaction.reply("A challenge name or ID must be specified (case sensitive).");
+                return;
+            }
+            try {
+                const challenge = await findChallenge(param1);
+                await joinChallenge(challenge.id, interaction.user.id);
+                await interaction.reply("Challenge joined successfully.");
+                return;
+            } catch (err) {
+                if (err.message == "Challenge not found." || err.message == "Player has already joined the specified challenge." || err.message == "The specified challenge is not currently open.") {
+                    await interaction.reply(err.message);
+                    return;
+                } else {
+                    // Default error handling behaviour for unexpected errors
+                    throw new Error(err.message);
+                }
+            }
         }
         else if (option == 'help') {
             // NOTE: TODO help for individual params
@@ -153,7 +215,7 @@ module.exports = {
                 },
                 {
                     name: 'modify',
-                    value: '**Syntax** `/challenge modify <field> <value>`\n**Restrictions** Bot owner, challenge organiser\n**Usage** Modifies specified parameter of challenge\nSee `<field>` section for allowed fields.'
+                    value: '**Syntax** `/challenge modify <challengeID> <field> <value>`\n**Restrictions** Bot owner, challenge organiser\n**Usage** Modifies specified parameter of challenge\nSee `<field>` section for allowed fields.'
                 },
                 {
                     name: 'display',
