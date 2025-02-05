@@ -1,7 +1,7 @@
 const { Collection, Events } = require('discord.js');
 const { EASY_CD, ADMIN_ID, LOG_CHANNEL_ID } = require('../config.json');
 const { addEntry } = require('../exports/sheetMethods.js');
-const { createChallenge, joinChallenge } = require('../exports/databaseMethods.js')
+const { createChallenge, joinChallenge, createFlag } = require('../exports/databaseMethods.js')
 
 module.exports = {
 	name: Events.InteractionCreate,
@@ -27,12 +27,44 @@ module.exports = {
                     await interaction.reply(res);
                     return;
                 }
+
+                if (interaction.customId.startsWith('createFlagModal')) {
+                    function isInteger(value) {
+                        if(parseInt(value,10).toString()===value) {
+                          return true
+                        }
+                        return false;
+                    }
+
+                    const challengeID = interaction.customId.slice(15); // extracts challenge ID from the modal customID
+                    const flag = interaction.fields.getTextInputValue('flagInput');
+                    const flagTitle = interaction.fields.getTextInputValue('flagTitleInput');
+                    const flagInfo = interaction.fields.getTextInputValue('flagInfoInput');
+                    const value = interaction.fields.getTextInputValue('flagValueInput');
+                    const isLongAns = interaction.fields.getTextInputValue('isLongAnsInput');
+
+                    if (!(['true', 'false'].includes(isLongAns))) {
+                        await interaction.reply("isLongAns has to be one of these values (case sensitive): true | false");
+                        return;
+                    }
+                    
+                    if (!(isInteger(value))) {
+                        await interaction.reply("The points value has to be an integer.");
+                        return;
+                    }
+
+                    const res = await createFlag(challengeID, flag, flagTitle, flagInfo, Number(value), (isLongAns === 'true'));
+                    await interaction.reply(res);
+                    return;
+                }
+
                 if (interaction.customId === 'createChallengeModal') {
                     const name = interaction.fields.getTextInputValue('nameInput');
                     const organiser = interaction.fields.getTextInputValue('organiserInput');
                     const startDate = interaction.fields.getTextInputValue('startDateInput');
                     const duration = interaction.fields.getTextInputValue('durationInput');
                     const longAnsChannelID = interaction.fields.getTextInputValue('longAnsChannelIDInput');
+
                     const res = await createChallenge(name, organiser, startDate, duration, longAnsChannelID);
                     await interaction.reply(res)
                     return;

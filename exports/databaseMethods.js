@@ -30,6 +30,29 @@ async function registerUser(discordID, name, registrationDate) {
 
 /**
  * 
+ * @param {String} flag 
+ * @param {String} flagTitle 
+ * @param {String} flagInfo 
+ * @param {Number} value 
+ * @param {Boolean} isLongAns 
+ */
+async function createFlag(challengeID, flag, flagTitle, flagInfo, value, isLongAns) { 
+    await mongoose.connect(uri);
+    const dateCreated = new Date();
+
+    // checks if the flag specified is already used
+    const existingFlag = await Flag.find({ challengeID: challengeID, flag: flag });
+    if (existingFlag.length != 0) {
+        return "Flag is already used in the challenge.";
+    } else {
+        const newFlag = new Flag({ challengeID: challengeID, flag: flag, flagTitle: flagTitle, flagInfo: flagInfo, value: value, isLongAns: isLongAns, dateCreated: dateCreated });
+        await newFlag.save();
+        return "Flag added successfully.";
+    }
+}
+
+/**
+ * 
  * @param {String} challengeID 
  * @param {String} discordID 
  * @returns 
@@ -38,7 +61,7 @@ async function joinChallenge(challengeID, discordID) {
     await mongoose.connect(uri);
 
     const dateCreated = new Date();
-    const existingPlayer = await ChallengeParticipation.find({ challengeID: challengeID, playerID: discordID })
+    const existingPlayer = await ChallengeParticipation.find({ challengeID: challengeID, playerID: discordID });
     const challenge = await findChallenge(challengeID) // throws error if not found
     const isOpen = await challenge.isOpen
     if (existingPlayer.length != 0) {
@@ -182,5 +205,6 @@ module.exports = {
     joinChallenge,
     createChallenge,
     checkFlag,
-    findChallenge
+    findChallenge,
+    createFlag
 }

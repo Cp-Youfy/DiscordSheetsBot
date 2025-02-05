@@ -1,6 +1,6 @@
-const { SlashCommandBuilder } = require('discord.js');
-const { EASY_CD } = require('../../config.json');
-const { registerUser } = require('../../exports/databaseMethods.js')
+const { SlashCommandBuilder, ActionRowBuilder, ModalBuilder, TextInputBuilder, TextInputStyle } = require('discord.js');
+const { EASY_CD, ADMIN_ID } = require('../../config.json');
+const { findChallenge } = require('../../exports/databaseMethods.js')
 
 module.exports = {
     cooldown: EASY_CD,
@@ -22,39 +22,40 @@ module.exports = {
             }
 
             const challenge = await findChallenge(challengeID);
+            // Sanitising challengeID to avoid directly putting user input into modal custom ID
             if (interaction.user.id != ADMIN_ID && interaction.user.id != challenge.organiser) {
-                await interaction.reply("Only the challenge organiser or bot owner can modify challenge fields.");
+                await interaction.reply("Only the challenge organiser or bot owner can add flags.");
                 return;
             }
     
             // Retrieve information on the challenge using a modal
             const modal = new ModalBuilder()
-                .setCustomId('createFlagModal')
+                .setCustomId(`createFlagModal${challenge._id}`)
                 .setTitle('Create a new flag');
     
             const flag = new TextInputBuilder()
                 .setMaxLength(128)
-                .setCustomId('flag')
+                .setCustomId('flagInput')
                 .setLabel("Flag")
                 .setRequired(true)
                 .setStyle(TextInputStyle.Short);
 
             const flagTitle = new TextInputBuilder()
                 .setMaxLength(150)
-                .setCustomId('flagTitle')
+                .setCustomId('flagTitleInput')
                 .setLabel("Title of question")
                 .setRequired(true)
                 .setStyle(TextInputStyle.Short);
             
             const flagInfo = new TextInputBuilder()
                 .setMaxLength(400)
-                .setCustomId('flagInfo')
+                .setCustomId('flagInfoInput')
                 .setLabel("Question details")
                 .setRequired(true)
-                .setStyle(TextInputStyle.Long);
+                .setStyle(TextInputStyle.Paragraph);
                 
             const value = new TextInputBuilder()
-                .setCustomId('flagValue')
+                .setCustomId('flagValueInput')
                 .setLabel("Flag Value")
                 .setPlaceholder("100")
                 .setRequired(true)
@@ -62,7 +63,7 @@ module.exports = {
             
             const isLongAns = new TextInputBuilder()
                 .setMaxLength(5)
-                .setCustomId('isLongAns')
+                .setCustomId('isLongAnsInput')
                 .setLabel("Additional information (long answer) expected")
                 .setPlaceholder("true | false")
                 .setValue('false')
@@ -82,7 +83,7 @@ module.exports = {
     
             // Show the modal to the user
             await interaction.showModal(modal);
-        } catch (error) {
+        } catch (err) {
             if (err.message == "Challenge not found.") {
                 await interaction.reply(err.message);
                 return;

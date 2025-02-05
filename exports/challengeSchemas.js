@@ -60,7 +60,6 @@ const flagsObtainedSchema = new mongoose.Schema({
 
 const flagSchema = new mongoose.Schema({
     challengeID: { type: String, required: true },
-    flagID: { type: String, required: true },
     flag: { type: String, required: true },
     flagTitle: { type: String, required: true }, // question title
     flagInfo: { type: String, required: true }, // question information
