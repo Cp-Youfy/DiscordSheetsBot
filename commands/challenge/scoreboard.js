@@ -1,6 +1,10 @@
-const { SlashCommandBuilder } = require('discord.js');
-const { EASY_CD, ENTRIES_PER_PAGE } = require('../../CONSTANTS.json');
-const { registerUser } = require('../../exports/databaseMethods.js')
+const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
+const { EASY_CD, ENTRIES_PER_PAGE, EMBED_COLOUR_GEN } = require('../../CONSTANTS.json');
+const { findChallenge } = require('../../exports/databaseMethods.js');
+const { Scoreboard, Player } = require('../../exports/challengeSchemas');
+
+// Derive page spans
+const MAX_PAGE = Math.ceil(100 / ENTRIES_PER_PAGE) - 1;
 
 // leaderboard command inspired by https://github.com/Ai0796/RoboNene/blob/master/client/commands/leaderboard.js :)
 module.exports = {
@@ -9,22 +13,78 @@ module.exports = {
 		.setName('scoreboard')
 		.setDescription('Display the scoreboard for a challenge')
         .addStringOption(option =>
-            option.setName('challengeID')
-                .setDescription('Challenge name or ID (case sensitive)')
+            option.setName('challenge')
+                .setDescription('Challenge ID or Name (case sensitive)')
                 .setRequired(true),
             ),	
 	async execute(interaction) {
+        await interaction.deferReply();
         try {
-            const challengeID = interaction.options.getString('challengeID') ?? null;
-            const res = await registerUser(interaction.user.id, nameString, Date.now());
-            await interaction.reply(res);
+            // Retrieve and check challengeID
+            const challengeID = interaction.options.getString('challenge') ?? null;
+            if (challengeID == null) {
+                await interaction.reply("A challenge ID must be specified (case sensitive). You can find the challenge ID by displaying the challenge using `challenge display`.");
+                return;
+            }
+
+            const challenge = await findChallenge(challengeID);
+            const scoreboardData = await Scoreboard.find({ challengeID: challenge._id }).sort({ scoreValue: 'desc' });
+            var page = 0;
+            var scoreboardText = "";
+            const embedArr = [];
+            const toShowId = !challenge.isHiddenID
+            
+            // Populates scoreboardText: note forEach doesn't work with async callback function
+            for (const [i, doc] of scoreboardData.entries()) {
+                const player = await Player.findById(doc.playerID);
+                const playerName = player?.name ?? 'undefined';
+                const shownID = toShowId ? ` (${doc.playerID}) ` : ' ';
+
+                embedArr.push({
+                    name: '',
+                    value: `\`${i + 1} ${playerName}${shownID}${doc.scoreValue}\`\n`,
+                    inline: false
+                })
+            }
+
+            const leaderboardEmbed = {
+                color: EMBED_COLOUR_GEN,
+                title: `Scoreboard of **${challenge.name}**`,
+                fields: embedArr,
+                timestamp: new Date().toISOString(),
+                footer: {
+                    text: `Page ${page + 1}`,
+                    icon_url: interaction.user.displayAvatarURL()
+                }
+            }
+        
+          const leaderboardButtons = new ActionRowBuilder()
+            .addComponents(
+              new ButtonBuilder()
+                .setCustomId('prev')
+                .setLabel('PREV')
+                .setStyle(ButtonStyle.Secondary)
+                .setEmoji('⬅️'),
+              new ButtonBuilder()
+                .setCustomId('next')
+                .setLabel('NEXT')
+                .setStyle(ButtonStyle.Secondary)
+                .setEmoji('➡️'),
+              new ButtonBuilder()
+                .setCustomId('mobile')
+                .setLabel('MOBILE')
+                .setStyle(ButtonStyle.Secondary)
+                .setEmoji('📲'),
+            )
+
+            await interaction.editReply({ embeds: [leaderboardEmbed] });
             return;
-        } catch (error) {
-            if (error.message == "Player already exists.") {
-                await interaction.reply("You have already registered!");
+        } catch (err) {
+            if (err.message == "Challenge not found.") {
+                await interaction.reply(err.message);
                 return;
             } else {
-                throw error;
+                throw err;
             }
         }
 	},

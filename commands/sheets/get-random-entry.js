@@ -1,5 +1,5 @@
 const { SlashCommandBuilder } = require('discord.js');
-const { EASY_CD } = require('../../CONSTANTS.json');
+const { EASY_CD, EMBED_COLOUR_GEN } = require('../../CONSTANTS.json');
 const assert = require('assert');
 const { getEntry } = require('../../exports/sheetMethods.js');
 
@@ -25,7 +25,7 @@ module.exports = {
             const res = await getEntry(n);
 
             const embed = {
-                color: 0x0099ff,
+                color: EMBED_COLOUR_GEN,
                 title: 'Random entries retrieved',
                 description: 'To refresh cached results, use `/cache-json`',
                 fields: res,

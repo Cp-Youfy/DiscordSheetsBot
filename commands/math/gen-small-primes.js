@@ -1,7 +1,7 @@
 const assert = require('assert')
 
 const { SlashCommandBuilder } = require('discord.js');
-const { MEDIUM_CD } = require('../../CONSTANTS.json');
+const { MEDIUM_CD, EMBED_COLOUR_GEN } = require('../../CONSTANTS.json');
 MAX_LENGTH = 1000
 
 module.exports = {
@@ -117,7 +117,7 @@ module.exports = {
         ]
 
         const embed = {
-            color: 0x0099ff,
+            color: EMBED_COLOUR_GEN,
             title: 'Prime Number Generation',
             url: 'https://en.wikipedia.org/wiki/Sieve_of_Eratosthenes',
             description: 'Uses Sieve of Eratosthenes Algorithm',

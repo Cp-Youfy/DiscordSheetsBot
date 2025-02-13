@@ -1,6 +1,6 @@
 const { SlashCommandBuilder, ActionRowBuilder, ModalBuilder, TextInputBuilder, TextInputStyle } = require('discord.js');
 const { ADMIN_ID } = require('../../config.json');
-const { HARD_CD } = require('../../CONSTANTS.json')
+const { HARD_CD, EMBED_COLOUR_GEN } = require('../../CONSTANTS.json')
 const assert = require('assert');
 const { findChallenge, joinChallenge } = require('../../exports/databaseMethods.js')
 const { ObjectId } = require('mongodb')
@@ -113,7 +113,7 @@ module.exports = {
             }
             try {
                 const challenge = await findChallenge(param1);
-                if (interaction.user.id != challenge.prganiser && interaction.user.id != ADMIN_ID) {
+                if (interaction.user.id != challenge.organiser && interaction.user.id != ADMIN_ID) {
                     await interaction.reply("Only the challenge organiser or bot owner can modify challenge fields.");
                     return;
                 }
@@ -154,7 +154,7 @@ module.exports = {
                 const endDate = date.toString();
 
                 var embed = {
-                    color: 0x0099ff,
+                    color: EMBED_COLOUR_GEN,
                     title: `Details of challenge ${challenge.name}`,
                     description: `
                     **ID** ${challenge.id}
@@ -198,7 +198,7 @@ module.exports = {
                 await interaction.reply("Challenge joined successfully.");
                 return;
             } catch (err) {
-                if (err.message == "Challenge not found." || err.message == "Player has already joined the specified challenge." || err.message == "The specified challenge is not currently open.") {
+                if (err.message == "The specified challenge has ended." || err.message == "Player has not registered. Use `/register` to register." || err.message == "Challenge not found." || err.message == "Player has already joined the specified challenge." || err.message == "The specified challenge is not currently open.") {
                     await interaction.reply(err.message);
                     return;
                 } else {
@@ -233,7 +233,7 @@ module.exports = {
             ]
 
             var embed = {
-                color: 0x0099ff,
+                color: EMBED_COLOUR_GEN,
                 title: 'Help',
                 timestamp: new Date().toISOString(),
             };

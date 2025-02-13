@@ -1,5 +1,4 @@
-const { SlashCommandBuilder, ActionRowBuilder, ModalBuilder, TextInputBuilder, TextInputStyle } = require('discord.js');
-const { ADMIN_ID } = require('../../config.json');
+const { SlashCommandBuilder } = require('discord.js');
 const { EASY_CD } = require('../../CONSTANTS.json');
 const { submitFlag, findChallenge } = require('../../exports/databaseMethods.js')
 

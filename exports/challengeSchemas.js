@@ -19,7 +19,7 @@ const challengeSchema = new mongoose.Schema({
 });
 
 const playerSchema = new mongoose.Schema({
-    id: { type: String, required: true }, // String, not ObjectId
+    _id: { type: String, required: true }, // String, not ObjectId
     name: { type: String, required: true },
     registrationDate: { type: String, required: true },
     dateCreated: { type: Date, required: true }

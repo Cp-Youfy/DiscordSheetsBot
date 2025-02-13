@@ -18,9 +18,9 @@ async function registerUser(discordID, name, registrationDate) {
     await mongoose.connect(uri);
 
     const existingPlayer = await Player.findById(discordID);
-    if (existingPlayer.length == 0) {
+    if (!existingPlayer) {
         const dateCreated = new Date();
-        const player = new Player({ id: discordID, name: name, registrationDate: registrationDate, dateCreated: dateCreated });
+        const player = new Player({ _id: discordID, name: name, registrationDate: registrationDate, dateCreated: dateCreated });
         await player.save();
         return `Registration complete! Your display name is ${name}.`;
     } else {
@@ -63,11 +63,20 @@ async function joinChallenge(challengeID, discordID) {
     const dateCreated = new Date();
     const existingPlayer = await Scoreboard.find({ challengeID: challengeID, playerID: discordID });
     const challenge = await findChallenge(challengeID) // throws error if not found
-    const isOpen = await challenge.isOpen
+    const isOpen = challenge.isOpen
+    const isOver = (new Date() > new Date(challenge.startDate.getTime() + challenge.duration));
+    const playerRegistered = await Player.findById(discordID);
+
     if (existingPlayer.length != 0) {
         throw new Error("Player has already joined the specified challenge.");
     } else if (!isOpen) {
         throw new Error("The specified challenge is not currently open.")
+    } else if (isOver) {
+        // Check if the challenge is over (implicitly implies that it should not be open...)
+        throw new Error("The specified challenge has ended.")
+    } else if (!playerRegistered) {
+        // Check if player has registered with the bot
+        throw new Error("Player has not registered. Use `/register` to register.")
     } else {
         const scoreboardEntry = new Scoreboard({ challengeID: challengeID, playerID: discordID, scoreValue: 0, dateCreated: dateCreated });
         await scoreboardEntry.save();
@@ -127,7 +136,7 @@ async function submitFlag(flagString, challengeID, discordID, additionalInput) {
         if (existingChallenge.length == 0) {
             throw new Error("Challenge does not exist: Is your challenge ID correct?")
         } else {
-            throw new Error(`You have not joined the challenge. Use ${inlineCode('/challenge join') + inlineCode(challengeID)} to join the challenge first.`);
+            throw new Error(`You have not joined the challenge. Use ${inlineCode('/challenge join ' + challengeID) } to join the challenge first.`);
         }
     }
 

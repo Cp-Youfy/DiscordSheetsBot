@@ -1,5 +1,5 @@
 const { ButtonBuilder, ButtonStyle, ActionRowBuilder, SlashCommandBuilder } = require('discord.js');
-const { EASY_CD } = require('../../CONSTANTS.json');
+const { EASY_CD, EMBED_COLOUR_GEN } = require('../../CONSTANTS.json');
 const emojiCharacters = require('../../exports/emojiCharacters.js')
 const { getEntry } = require('../../exports/sheetMethods.js');
 
@@ -30,7 +30,7 @@ module.exports = {
     }))
 
         const embed = {
-            color: 0x0099ff,
+            color: EMBED_COLOUR_GEN,
             title: 'Quiz',
             description: `What is the definition of the word ${wordToGuess}?`,
             fields: options,
