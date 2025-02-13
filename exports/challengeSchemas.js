@@ -16,22 +16,7 @@ const challengeSchema = new mongoose.Schema({
             return this.id.where({ challengeName: challengeName })
         }
     }
- });
-
-const challengeParticipationSchema = new mongoose.Schema({
-    challengeID: { type: String, required: true },
-    playerID: { type: String, required: true },
-    dateCreated: { type: Date, required: true }
-}, { 
-    collection: 'challengeParticipation',
-    query: {
-        byChallengeID(challengeID) {
-            return this.where({ challengeID: challengeID });
-        },
-        byPlayerID(playerID) {
-            return this.where({ playerID: playerID });
-        }
-    } });
+});
 
 const playerSchema = new mongoose.Schema({
     id: { type: String, required: true }, // String, not ObjectId
@@ -43,15 +28,11 @@ const playerSchema = new mongoose.Schema({
 const flagsObtainedSchema = new mongoose.Schema({
     playerID: { type: String, required: true },
     challengeID: { type: String, required: true },
-    flagID: { type: String, required: true },
+    flag: { type: String, required: true },
     dateCreated: { type: Date, required: true }
 }, { 
     collection: 'flagsObtained',
     query: {
-        byUniqueID(uniqueID) {
-            const [challengeID, flagID] = uniqueID.split('_');
-            return this.where({ challengeID: challengeID, flagID: flagID });
-        },
         byPlayerID(playerID) {
             return this.where({ playerID: playerID });
         }
@@ -69,7 +50,6 @@ const flagSchema = new mongoose.Schema({
 }, { 
     collection: 'flags',
     query: {
-        // use a combination of challengeID and flag to check for flags rather than byFlag() to avoid cross-referencing challenges
         byValue(value) {
             return this.where({ value: value });
         },
@@ -84,11 +64,6 @@ const flagSchema = new mongoose.Schema({
         },
     } });
 
-flagSchema.methods.getUniqueID = function getUniqueID() {
-    const uniqueID = this.challengeID + '_' + this.flagID;
-    return uniqueID
-};
-
 const scoreboardSchema = new mongoose.Schema({
     challengeID: { type: String, required: true },
     playerID: { type: String, required: true },
@@ -96,21 +71,9 @@ const scoreboardSchema = new mongoose.Schema({
     dateCreated: { type: Date, required: true }
 }, {
     collection: 'scoreboard',
-    query: {
-        byUniqueID(uniqueID) {
-            const [challengeID, playerID] = uniqueID.split('_');
-            return this.where({ challengeID: challengeID, playerID: playerID });
-        }
-    }
 });
 
-scoreboardSchema.methods.getUniqueID = function getUniqueID() {
-    const uniqueID = this.challengeID + '_' + this.playerID;
-    return uniqueID
-}
-
 const Challenge = mongoose.model('Challenge', challengeSchema);
-const ChallengeParticipation = mongoose.model('challengeParticipation', challengeParticipationSchema);
 const Player = mongoose.model('Player', playerSchema);
 const FlagsObtained = mongoose.model('FlagsObtained', flagsObtainedSchema);
 const Flag = mongoose.model('Flag', flagSchema);
@@ -118,7 +81,6 @@ const Scoreboard = mongoose.model('Scoreboard', scoreboardSchema);
 
 module.exports = {
     Challenge: Challenge,
-    ChallengeParticipation: ChallengeParticipation,
     Player: Player,
     FlagsObtained: FlagsObtained,
     Flag: Flag, 

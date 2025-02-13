@@ -3,7 +3,7 @@ const { ObjectId } = require('mongodb');
 const { inlineCode } = require('discord.js');
 const assert = require('assert');
 const { DATABASE_USERNAME, DATABASE_PASSWORD, DATABASE_NAME, DEFAULT_CHANNEL_LOG_ID } = require('../config.json');
-const { Challenge, ChallengeParticipation, Player, FlagsObtained, Flag, Scoreboard } = require('./challengeSchemas.js');
+const { Challenge, Player, FlagsObtained, Flag, Scoreboard } = require('./challengeSchemas.js');
 
 const uri = `mongodb+srv://${DATABASE_USERNAME}:${DATABASE_PASSWORD}@challenge.g4x9t.mongodb.net/${DATABASE_NAME}?retryWrites=true&w=majority&appName=challenge`;
 
@@ -61,7 +61,7 @@ async function joinChallenge(challengeID, discordID) {
     await mongoose.connect(uri);
 
     const dateCreated = new Date();
-    const existingPlayer = await ChallengeParticipation.find({ challengeID: challengeID, playerID: discordID });
+    const existingPlayer = await Scoreboard.find({ challengeID: challengeID, playerID: discordID });
     const challenge = await findChallenge(challengeID) // throws error if not found
     const isOpen = await challenge.isOpen
     if (existingPlayer.length != 0) {
@@ -69,8 +69,6 @@ async function joinChallenge(challengeID, discordID) {
     } else if (!isOpen) {
         throw new Error("The specified challenge is not currently open.")
     } else {
-        const challengeParticipation = new ChallengeParticipation({ challengeID: challengeID, playerID: discordID, dateCreated: dateCreated });
-        await challengeParticipation.save();
         const scoreboardEntry = new Scoreboard({ challengeID: challengeID, playerID: discordID, scoreValue: 0, dateCreated: dateCreated });
         await scoreboardEntry.save();
         return "Entry added successfully";
@@ -116,13 +114,14 @@ async function createChallenge(name, organiser, startDate, duration, longAnsChan
  * @param {String} flagString 
  * @param {String} challengeID 
  * @param {String} discordID 
- * @returns 
+ * @param {String | Null} additionalInput
+ * @returns {String}
  */
-async function checkFlag(flagString, challengeID, discordID) {
+async function submitFlag(flagString, challengeID, discordID, additionalInput) {
     await mongoose.connect(uri);
 
-    const existingPlayer = await ChallengeParticipation.find({ challengeID: challengeID, playerID: discordID });
-    if (existingPlayer.length == 0) {
+    const scoreboardPlayer = await Scoreboard.find({ challengeID: challengeID, playerID: discordID });
+    if (scoreboardPlayer.length == 0) {
         const challengeIdAsObjectId = new ObjectId(challengeID)
         const existingChallenge = await Challenge.findById(challengeIdAsObjectId)
         if (existingChallenge.length == 0) {
@@ -132,23 +131,31 @@ async function checkFlag(flagString, challengeID, discordID) {
         }
     }
 
-    const flag = await Flag.find({ challengeID: challengeID, flag: flagString });
-    if (flag.length == 0) {
+    const flagArr = await Flag.find({ challengeID: challengeID, flag: flagString });
+    
+    if (flagArr.length == 0) {
         return "Wrong flag";
     }
 
-    const flagUniqueID = flag.getUniqueID()
-    const existingSubmission = await FlagsObtained.find().byUniqueID(flagUniqueID);
+    const flag = flagArr[0]
+    const hasAdditionalInput = flag.isLongAns;
+    const flagValue = flag.value;
+
+    const existingSubmission = await FlagsObtained.find({ challengeID: challengeID, playerID: discordID, flag: flag.flag });
     const dateCreated = new Date();
 
-    if (existingSubmission.length == 0) {
-        const flagSubmission = new FlagsObtained({ challengeID: challengeID, playerID: discordID, flagID: flag.flagID, dateCreated: dateCreated });
-        await flagSubmission.save();
-    } else {
-        return "Flag has been submitted before"
+    if (hasAdditionalInput && additionalInput == null) {
+        return "Additional input required for this challenge.";
     }
 
-    const scoreboardUpdateRes = await Scoreboard.findOneAndUpdate({ challengeID: challengeID, playerID: discordID }, { scoreValue: scoreValue + flag.value });
+    if (existingSubmission.length == 0) {
+        const flagSubmission = new FlagsObtained({ challengeID: challengeID, playerID: discordID, flag: flagString, dateCreated: dateCreated });
+        await flagSubmission.save();
+    } else {
+        return "Flag has been submitted before";
+    }
+
+    const scoreboardUpdateRes = await Scoreboard.findOneAndUpdate({ challengeID: challengeID, playerID: discordID }, { $inc: { scoreValue: flagValue } });
 
     if (scoreboardUpdateRes.length == 0) {
         // default error handling
@@ -204,7 +211,7 @@ module.exports = {
     registerUser,
     joinChallenge,
     createChallenge,
-    checkFlag,
+    submitFlag,
     findChallenge,
     createFlag
 }
