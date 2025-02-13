@@ -1,5 +1,5 @@
 const { SlashCommandBuilder } = require('discord.js');
-const { MEDIUM_CD } = require('../../config.json');
+const { MEDIUM_CD } = require('../../CONSTANTS.json');
 const { addEntry } = require('../../exports/sheetMethods.js');
 
 module.exports = {

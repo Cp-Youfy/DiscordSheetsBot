@@ -1,7 +1,7 @@
 const assert = require('assert')
 
 const { SlashCommandBuilder } = require('discord.js');
-const { EASY_CD } = require('../../config.json');
+const { EASY_CD } = require('../../CONSTANTS.json');
 
 module.exports = {
     cooldown: EASY_CD,

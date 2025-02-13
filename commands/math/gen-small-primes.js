@@ -1,7 +1,7 @@
 const assert = require('assert')
 
 const { SlashCommandBuilder } = require('discord.js');
-const { MEDIUM_CD } = require('../../config.json');
+const { MEDIUM_CD } = require('../../CONSTANTS.json');
 MAX_LENGTH = 1000
 
 module.exports = {

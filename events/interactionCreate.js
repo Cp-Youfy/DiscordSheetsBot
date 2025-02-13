@@ -1,5 +1,6 @@
 const { Collection, Events } = require('discord.js');
-const { EASY_CD, ADMIN_ID, LOG_CHANNEL_ID } = require('../config.json');
+const { ADMIN_ID, LOG_CHANNEL_ID } = require('../config.json');
+const { EASY_CD } = require('../CONSTANTS.json')
 const { addEntry } = require('../exports/sheetMethods.js');
 const { createChallenge, joinChallenge, createFlag } = require('../exports/databaseMethods.js')
 

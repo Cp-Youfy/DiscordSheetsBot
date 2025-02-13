@@ -1,5 +1,6 @@
 const { SlashCommandBuilder, ActionRowBuilder, ModalBuilder, TextInputBuilder, TextInputStyle } = require('discord.js');
-const { HARD_CD, ADMIN_ID } = require('../../config.json');
+const { ADMIN_ID } = require('../../config.json');
+const { HARD_CD } = require('../../CONSTANTS.json')
 const assert = require('assert');
 const { findChallenge, joinChallenge } = require('../../exports/databaseMethods.js')
 const { ObjectId } = require('mongodb')

@@ -1,5 +1,5 @@
 const { ButtonBuilder, ButtonStyle, ActionRowBuilder, SlashCommandBuilder } = require('discord.js');
-const { EASY_CD } = require('../../config.json');
+const { EASY_CD } = require('../../CONSTANTS.json');
 const emojiCharacters = require('../../exports/emojiCharacters.js')
 const { getEntry } = require('../../exports/sheetMethods.js');
 

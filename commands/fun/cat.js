@@ -1,6 +1,6 @@
 const { SlashCommandBuilder } = require('discord.js');
 const fs = require('node:fs'); // identify command files
-const { EASY_CD } = require('../../config.json');
+const { EASY_CD } = require('../../CONSTANTS.json');
 const { request } = require('undici');
 
 module.exports = {

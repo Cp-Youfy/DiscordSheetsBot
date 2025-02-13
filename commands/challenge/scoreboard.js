@@ -1,20 +1,21 @@
 const { SlashCommandBuilder } = require('discord.js');
-const { HARD_CD } = require('../../CONSTANTS.json');
+const { EASY_CD, ENTRIES_PER_PAGE } = require('../../CONSTANTS.json');
 const { registerUser } = require('../../exports/databaseMethods.js')
 
+// leaderboard command inspired by https://github.com/Ai0796/RoboNene/blob/master/client/commands/leaderboard.js :)
 module.exports = {
-    cooldown: HARD_CD,
+    cooldown: EASY_CD,
 	data: new SlashCommandBuilder()
-		.setName('register')
-		.setDescription('Register your user in the database')
+		.setName('scoreboard')
+		.setDescription('Display the scoreboard for a challenge')
         .addStringOption(option =>
-            option.setName('name')
-                .setDescription('Display name to use in challenges')
+            option.setName('challengeID')
+                .setDescription('Challenge name or ID (case sensitive)')
                 .setRequired(true),
             ),	
 	async execute(interaction) {
         try {
-            const nameString = interaction.options.getString('name') ?? null;
+            const challengeID = interaction.options.getString('challengeID') ?? null;
             const res = await registerUser(interaction.user.id, nameString, Date.now());
             await interaction.reply(res);
             return;

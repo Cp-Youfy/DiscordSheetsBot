@@ -1,5 +1,5 @@
 const { SlashCommandBuilder } = require('discord.js');
-const { EASY_CD } = require('../../config.json');
+const { EASY_CD } = require('../../CONSTANTS.json');
 
 function getSeconds(str, resultType) {
     if (resultType == 's' || resultType == 'seconds') { fac = 60 }
