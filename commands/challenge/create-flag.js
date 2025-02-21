@@ -7,7 +7,7 @@ module.exports = {
     cooldown: EASY_CD,
 	data: new SlashCommandBuilder()
 		.setName('create-flag')
-		.setDescription('Add a flag to a challenge')
+		.setDescription('Add a puzzle to a challenge')
         .addStringOption(option =>
             option.setName('challenge')
                 .setDescription('Challenge ID or Name (case sensitive)')
@@ -25,7 +25,7 @@ module.exports = {
             const challenge = await findChallenge(challengeID);
             // Sanitising challengeID to avoid directly putting user input into modal custom ID
             if (interaction.user.id != ADMIN_ID && interaction.user.id != challenge.organiser) {
-                await interaction.reply("Only the challenge organiser or bot owner can add flags.");
+                await interaction.reply("Only the challenge organiser or bot owner can add puzzles.");
                 return;
             }
     
@@ -44,14 +44,14 @@ module.exports = {
             const flagTitle = new TextInputBuilder()
                 .setMaxLength(150)
                 .setCustomId('flagTitleInput')
-                .setLabel("Title of question")
+                .setLabel("Title of puzzle")
                 .setRequired(true)
                 .setStyle(TextInputStyle.Short);
             
             const flagInfo = new TextInputBuilder()
                 .setMaxLength(400)
                 .setCustomId('flagInfoInput')
-                .setLabel("Question details")
+                .setLabel("Puzzle details")
                 .setRequired(true)
                 .setStyle(TextInputStyle.Paragraph);
                 
@@ -62,12 +62,11 @@ module.exports = {
                 .setRequired(true)
                 .setStyle(TextInputStyle.Short);
             
-            const isLongAns = new TextInputBuilder()
-                .setMaxLength(5)
-                .setCustomId('isLongAnsInput')
-                .setLabel("Additional information (long answer) expected")
-                .setPlaceholder("true | false")
-                .setValue('false')
+            const submissionOpenDate = new TextInputBuilder()
+                .setMaxLength(19)
+                .setCustomId('submissionOpenDateInput')
+                .setLabel("Start Date (YYYY-MM-DDTHH:MM:SS)")
+                .setPlaceholder("YYYY-MM-DDTHH:MM:SS")
                 .setStyle(TextInputStyle.Short);
                         
             // An action row only holds one text input,
@@ -76,7 +75,7 @@ module.exports = {
             const secondActionRow = new ActionRowBuilder().addComponents(flagTitle);
             const thirdActionRow = new ActionRowBuilder().addComponents(flagInfo);
             const fourthActionRow = new ActionRowBuilder().addComponents(value);
-            const fifthActionRow = new ActionRowBuilder().addComponents(isLongAns);
+            const fifthActionRow = new ActionRowBuilder().addComponents(submissionOpenDate);
 
     
             // Add inputs to the modal

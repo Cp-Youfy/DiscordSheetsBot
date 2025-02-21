@@ -1,9 +1,8 @@
 const { SlashCommandBuilder, ActionRowBuilder, ModalBuilder, TextInputBuilder, TextInputStyle } = require('discord.js');
 const { ADMIN_ID } = require('../../config.json');
 const { HARD_CD, EMBED_COLOUR_GEN } = require('../../CONSTANTS.json')
-const assert = require('assert');
 const { findChallenge, joinChallenge } = require('../../exports/databaseMethods.js')
-const { ObjectId } = require('mongodb')
+const { Challenge } = require('../../exports/challengeSchemas.js');
 
 module.exports = {
     cooldown: HARD_CD,
@@ -118,12 +117,22 @@ module.exports = {
                     return;
                 }
                 const field = param2;
-                if (!(['name', 'organiser', 'startDate', 'duration', 'isHiddenID', 'longAnsChannelID', 'isOpen', 'logChannelID'].includes(field))) {
+                if (!(['name', 'organiser', 'startDate', 'duration', 'isHiddenID', 'longAnsChannelID', 'isOpen', 'logChannelID', 'isTargeted', 'isFirstBlood', 'isBonusTimeLimit', 'puzzleMakerID'].includes(field))) {
                     await interaction.reply("Invalid field specified. See `<field>` section for allowed fields and ensure case is accurate.");
                     return;
                 }
 
                 const value = param3;
+
+                // Deal with boolean fields separately since typecasting is garbage for those
+                if (field == 'isTargeted' || field == 'isOpen' || field == 'isBonusTimeLimit' || field == 'isFirstBlood') {
+                    const modValue = (value === 'true');
+                    challenge[field] = modValue;
+                    await challenge.save();
+                    await interaction.reply(`Field changed successfully to ${modValue} (true/false)`);
+                    return;
+                }
+
                 challenge[field] = value;
                 
                 await challenge.save();
@@ -168,6 +177,9 @@ module.exports = {
                     **isOpen** ${challenge.isOpen}
                     **dateCreated** ${challenge.dateCreated}
                     **logChannelID** ${challenge.logChannelID}
+                    **isTargeted** ${challenge.isTargeted}
+                    **isFirstBlood** ${challenge.isFirstBlood}
+                    **isBonusTimeLimit** ${challenge.isBonusTimeLimit}
                     `,
                     footer: {
                         text: '❓ Use `/challenge help` for details on each field.'
@@ -228,7 +240,7 @@ module.exports = {
                 },
                 {
                     name: '<field>',
-                    value: 'id (UNCHANGEABLE -- uniquely and randomly generated) | name | organiser (bot owner only) | startDate | duration | isHiddenID (whether Discord IDs of players should be shown on the leaderboard) | longAnsChannelID (channel ID where long answers should be sent; null to disable long answers) | isOpen (whether new players can join the challenge -- does NOT affect ability to submit flags; that is determined by `startDate` and `duration`)'
+                    value: 'id (UNCHANGEABLE -- uniquely and randomly generated) | name | organiser (bot owner only) | startDate | duration | isHiddenID (whether Discord IDs of players should be shown on the leaderboard) | longAnsChannelID (channel ID where long answers should be sent; null to disable long answers) | logChannelID (channel ID to send submissions, etc.) | isOpen (whether new players can join the challenge -- does NOT affect ability to submit puzzles; that is determined by `startDate` and `duration`) | isTargeted (whether flag submissions must be targeted to a specific puzzle) | isBonusTimeLimit (whether bonus is awarded for submission within a time limit) | isFirstBlood (whether first blood multiplier is applied)'
                 }
             ]
 

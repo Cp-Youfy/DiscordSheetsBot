@@ -1,9 +1,9 @@
 const { SlashCommandBuilder } = require('discord.js');
-const { HARD_CD } = require('../../CONSTANTS.json');
+const { EXTREME_CD } = require('../../CONSTANTS.json');
 const { registerUser } = require('../../exports/databaseMethods.js')
 
 module.exports = {
-    cooldown: HARD_CD,
+    cooldown: EXTREME_CD,
 	data: new SlashCommandBuilder()
 		.setName('register')
 		.setDescription('Register your user in the database')

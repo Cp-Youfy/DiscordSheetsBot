@@ -1,5 +1,5 @@
 const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
-const { EASY_CD, ENTRIES_PER_PAGE, EMBED_COLOUR_GEN } = require('../../CONSTANTS.json');
+const { HARD_CD, ENTRIES_PER_PAGE, EMBED_COLOUR_GEN } = require('../../CONSTANTS.json');
 const { findChallenge } = require('../../exports/databaseMethods.js');
 const { Scoreboard, Player } = require('../../exports/challengeSchemas');
 
@@ -8,7 +8,7 @@ const MAX_PAGE = Math.ceil(100 / ENTRIES_PER_PAGE) - 1;
 
 // leaderboard command inspired by https://github.com/Ai0796/RoboNene/blob/master/client/commands/leaderboard.js :)
 module.exports = {
-    cooldown: EASY_CD,
+    cooldown: HARD_CD,
 	data: new SlashCommandBuilder()
 		.setName('scoreboard')
 		.setDescription('Display the scoreboard for a challenge')

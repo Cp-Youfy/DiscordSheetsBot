@@ -1,12 +1,12 @@
 const { SlashCommandBuilder } = require('discord.js');
-const { EASY_CD } = require('../../CONSTANTS.json');
-const { submitFlag, findChallenge } = require('../../exports/databaseMethods.js')
+const { SUPER_EXTREME_CD } = require('../../CONSTANTS.json');
+const { submitFlag, findChallenge, findPlayerName } = require('../../exports/databaseMethods.js')
 
 module.exports = {
-    cooldown: EASY_CD,
+    cooldown: SUPER_EXTREME_CD,
 	data: new SlashCommandBuilder()
-		.setName('submit-flag')
-		.setDescription('Submit a flag to a challenge')
+		.setName('submit')
+		.setDescription('Submit a flag to a puzzle')
         .addStringOption(option =>
             option.setName('challenge')
                 .setDescription('Challenge ID or Name (case sensitive)')
@@ -18,6 +18,11 @@ module.exports = {
                 .setRequired(true),
         )
         .addStringOption(option =>
+            option.setName('puzzle_id')
+                .setDescription('PuzzleID')
+                .setRequired(false),
+        )
+        .addStringOption(option =>
             option.setName('additional_input')
                 .setDescription('Additional Input (for long answers)')
                 .setRequired(false),
@@ -26,6 +31,7 @@ module.exports = {
         try {
             const challengeID = interaction.options.getString('challenge') ?? null;
             const flag = interaction.options.getString('flag') ?? null;
+            const puzzle_id = interaction.options.getString('puzzle_id') ?? null;
             const additionalInput = interaction.options.getString('additional_input') ?? null;
 
             if (challengeID == null) {
@@ -39,10 +45,28 @@ module.exports = {
             }
 
             const challenge = await findChallenge(challengeID);
+            var res = '';
 
-            res = await submitFlag(flag, challenge._id, interaction.user.id, additionalInput);
+            if (challenge.isTargeted) {
+                // Targeted challenge -- necessitate puzzle_id
+                if (puzzle_id == null) {
+                    await interaction.reply("Please include the ID of the puzzle you are submitting to.")
+                    return;
+                } else {
+                    res = await submitFlag(flag, challenge._id, interaction.user.id, additionalInput, puzzle_id)
+                }
+            } else {
+                res = await submitFlag(flag, challenge._id, interaction.user.id, additionalInput)
+            }
+            
             await interaction.reply(res);
+
+            // Log submission in the log channel
+            const logChannel = await interaction.client.channels.fetch(challenge.logChannelID);
+            const lbUsername = await findPlayerName(interaction.user.id);
+            logChannel.send({ content: `User **${lbUsername}** (${interaction.user.id}) attempted puzzle submission for challenge **${challenge.name}**\nFlag: ${flag}\nPuzzle: ${puzzle_id}\nResponse: ${res}`, ephemeral: false});
             return;
+
         } catch (err) {
             if (err.message == "Challenge not found." || err.message.startsWith("You have not joined the challenge.")) {
                 await interaction.reply(err.message);

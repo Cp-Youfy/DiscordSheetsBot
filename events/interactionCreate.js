@@ -42,19 +42,14 @@ module.exports = {
                     const flagTitle = interaction.fields.getTextInputValue('flagTitleInput');
                     const flagInfo = interaction.fields.getTextInputValue('flagInfoInput');
                     const value = interaction.fields.getTextInputValue('flagValueInput');
-                    const isLongAns = interaction.fields.getTextInputValue('isLongAnsInput');
-
-                    if (!(['true', 'false'].includes(isLongAns))) {
-                        await interaction.reply("isLongAns has to be one of these values (case sensitive): true | false");
-                        return;
-                    }
+                    const submissionOpenDate = interaction.fields.getTextInputValue('submissionOpenDateInput');
                     
                     if (!(isInteger(value))) {
                         await interaction.reply("The points value has to be an integer.");
                         return;
                     }
 
-                    const res = await createFlag(challengeID, flag, flagTitle, flagInfo, Number(value), (isLongAns === 'true'));
+                    const res = await createFlag(challengeID, flag, flagTitle, flagInfo, Number(value), submissionOpenDate);
                     await interaction.reply(res);
                     return;
                 }
@@ -135,7 +130,7 @@ module.exports = {
                 return;
             }
             console.error(error);
-            logChannel.send({content: `**ERROR [COMMAND]** (${interaction.commandName}) | ${error}`});
+            logChannel.send({content: `**ERROR [COMMAND]** (${interaction.commandName || 'undefined'}) | ${error}`});
             if (interaction.replied || interaction.deferred) {
                 await interaction.followUp({ content: 'There was an error while executing this command!', ephemeral: true });
             } else {

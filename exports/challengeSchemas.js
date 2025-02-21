@@ -9,7 +9,11 @@ const challengeSchema = new mongoose.Schema({
     longAnsChannelID: { type: String || null, required: true },
     isOpen: { type: Boolean, required: true }, // whether the competition can be joined; default to false
     dateCreated: { type: Date, required: true },
-    logChannelID: {type: String || null, required: true}
+    logChannelID: {type: String || null, required: true},
+    isTargeted: { type: Boolean, required: true }, // whether puzzle ID must be specified for submissions
+    isBonusTimeLimit: { type: Boolean, required: true }, // whether points are multiplied by multiplier if puzzle is submitted within a specified time limit
+    isFirstBlood: { type: Boolean, required: true }, // whether additional points are given to the first solver of a puzzle
+    puzzleMakerID: { type: String, required: true } // role ID of puzzle makers - can validate long answers
 }, { collection: 'challenges',
     query: {
         challengeNameToID(challengeName) {
@@ -46,7 +50,9 @@ const flagSchema = new mongoose.Schema({
     flagInfo: { type: String, required: true }, // question information
     isLongAns: { type: Boolean, required: false }, // long answer format (Challenge.longAnsChannelID? takes precedence!)
     value: { type: Number, required: true },
-    dateCreated: { type: Date, required: true }
+    dateCreated: { type: Date, required: true },
+    submissionOpenDate: { type: Date, required: true } // date from which to allow submissions of flag
+    
 }, { 
     collection: 'flags',
     query: {
@@ -73,16 +79,25 @@ const scoreboardSchema = new mongoose.Schema({
     collection: 'scoreboard',
 });
 
+const longAnswerSchema = new mongoose.Schema({
+    flagID: { type: String, required: true }, // Flag._id
+    contents: { type: String, required: true }, // the long answer
+}, {
+    collection: 'longAnswers'
+})
+
 const Challenge = mongoose.model('Challenge', challengeSchema);
 const Player = mongoose.model('Player', playerSchema);
 const FlagsObtained = mongoose.model('FlagsObtained', flagsObtainedSchema);
 const Flag = mongoose.model('Flag', flagSchema);
 const Scoreboard = mongoose.model('Scoreboard', scoreboardSchema);
+const LongAnswer = mongoose.model('LongAnswer', longAnswerSchema)
 
 module.exports = {
     Challenge: Challenge,
     Player: Player,
     FlagsObtained: FlagsObtained,
     Flag: Flag, 
-    Scoreboard: Scoreboard
+    Scoreboard: Scoreboard,
+    LongAnswer: LongAnswer
 }
