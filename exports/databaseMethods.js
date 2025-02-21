@@ -173,20 +173,26 @@ async function submitFlag(flagString, challengeID, discordID, additionalInput, p
     // Searches with puzzle ID if necessary
     const flagArr = await (puzzle_id === null ? 
         Flag.find({ challengeID: challengeID, flag: flagString }) :
-        Flag.find({ challengeID: challengeID, flag: flagString, _id: new ObjectId(puzzle_id) })
+        Flag.findById(puzzle_id)
     );
     
-    if (flagArr.length == 0) {
+    if (!flagArr || (Array.isArray(flagArr) && flagArr.length === 0)) {
         return "Wrong flag";
     }
 
-    const flag = flagArr[0]
+    const flag = Array.isArray(flagArr) ? flagArr[0] : flagArr;
+    const dateCreated = new Date();
+
+    console.log(flag.submissionOpenDate - dateCreated)
+    if (flag.submissionOpenDate - dateCreated > 0) {
+        // Submission is not open
+        return `Puzzle submission is not open. It will open at ${flag.submissionOpenDate}`
+    }
 
     const hasAdditionalInput = flag.isLongAns;
     const flagValue = flag.value;
 
     const existingSubmission = await FlagsObtained.find({ challengeID: challengeID, playerID: discordID, flag: flag.flag });
-    const dateCreated = new Date();
 
     if (hasAdditionalInput && additionalInput == null) {
         return "Additional input required for this challenge.";
@@ -298,6 +304,17 @@ async function findFlag(param) {
     }
 }
 
+async function findScore(challengeID, discordID) {
+    await mongoose.connect(uri);
+
+    const res = await Scoreboard.find({ challengeID: challengeID.toString(), playerID: discordID });
+    if (res.length == 0) {
+        throw new Error("Scoreboard entry does not exist. Have you joined the challenge?")
+    } else {
+        return res[0].scoreValue
+    }
+}
+
 module.exports = {
     registerUser,
     joinChallenge,
@@ -306,5 +323,6 @@ module.exports = {
     findChallenge,
     createFlag,
     findFlag,
-    findPlayerName
+    findPlayerName,
+    findScore
 }

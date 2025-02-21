@@ -71,6 +71,10 @@ module.exports = {
             if (err.message == "Challenge not found." || err.message.startsWith("You have not joined the challenge.")) {
                 await interaction.reply(err.message);
                 return;
+            } 
+            else if (err.message.startsWith("input must be a 24 character hex string")) {
+                await interaction.reply("Invalid puzzle ID format.")
+                return;   
             } else {
                 // Default error handling behaviour for unexpected errors
                 throw new Error(err.message);
