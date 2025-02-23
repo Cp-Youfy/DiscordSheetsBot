@@ -80,6 +80,8 @@ const scoreboardSchema = new mongoose.Schema({
 });
 
 const longAnswerSchema = new mongoose.Schema({
+    challengeID: { type: String, required: true }, // challenge ID for puzzle submission
+    playerID: { type: String, required: true }, // discord ID of submitting player
     flagID: { type: String, required: true }, // Flag._id
     contents: { type: String, required: true }, // the long answer
 }, {

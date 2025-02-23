@@ -2,7 +2,6 @@ const { SlashCommandBuilder, ActionRowBuilder, ModalBuilder, TextInputBuilder, T
 const { ADMIN_ID } = require('../../config.json');
 const { HARD_CD, EMBED_COLOUR_GEN } = require('../../CONSTANTS.json')
 const { findChallenge, joinChallenge } = require('../../exports/databaseMethods.js')
-const { Challenge } = require('../../exports/challengeSchemas.js');
 
 module.exports = {
     cooldown: HARD_CD,
@@ -180,6 +179,7 @@ module.exports = {
                     **isTargeted** ${challenge.isTargeted}
                     **isFirstBlood** ${challenge.isFirstBlood}
                     **isBonusTimeLimit** ${challenge.isBonusTimeLimit}
+                    **puzzleMakerID** ${challenge.puzzleMakerID}
                     `,
                     footer: {
                         text: '❓ Use `/challenge help` for details on each field.'

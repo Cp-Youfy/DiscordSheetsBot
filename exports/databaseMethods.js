@@ -5,7 +5,6 @@ const { BONUS_WITHIN_TIME_LIMIT, BONUS_WITHIN_TIME_LIMIT_MULTIPLIER, FIRST_BLOOD
 const assert = require('assert');
 const { DATABASE_USERNAME, DATABASE_PASSWORD, DATABASE_NAME, DEFAULT_CHANNEL_LOG_ID } = require('../config.json');
 const { Challenge, Player, FlagsObtained, Flag, Scoreboard, LongAnswer } = require('./challengeSchemas.js');
-const challenge = require('../commands/challenge/challenge.js');
 
 const uri = `mongodb+srv://${DATABASE_USERNAME}:${DATABASE_PASSWORD}@challenge.g4x9t.mongodb.net/${DATABASE_NAME}?retryWrites=true&w=majority&appName=challenge`;
 
@@ -183,7 +182,6 @@ async function submitFlag(flagString, challengeID, discordID, additionalInput, p
     const flag = Array.isArray(flagArr) ? flagArr[0] : flagArr;
     const dateCreated = new Date();
 
-    console.log(flag.submissionOpenDate - dateCreated)
     if (flag.submissionOpenDate - dateCreated > 0) {
         // Submission is not open
         return `Puzzle submission is not open. It will open at ${flag.submissionOpenDate}`
@@ -205,10 +203,20 @@ async function submitFlag(flagString, challengeID, discordID, additionalInput, p
         return "Flag has been submitted before";
     }
 
+    if (hasAdditionalInput) {
+        if (additionalInput.length > 1800) {
+            return "Additional input must be of maximum length 1800 characters. Please attach pastebin link or something similar instead."
+        }
+        // Handle additional input puzzle logic differently
+        const longAnsSubmission = new LongAnswer({ challengeID: challengeID, playerID: discordID, flagID: flag._id, contents: additionalInput })
+        await longAnsSubmission.save();
+
+        return `LongAnsID|${longAnsSubmission._id}|${flag.flagTitle}|${additionalInput}`
+    }
+
     // Adds time limit bonus if applicable
     const dateNow = new Date()
     const withinHours = ((flag.submissionOpenDate - dateNow) / (1000 * 60 * 60) <= BONUS_WITHIN_TIME_LIMIT); // ms to hours -- checks against hour cap for bonus
-    console.log(challenge.isBonusTimeLimit)
     var flagValueProc = ( challenge.isBonusTimeLimit == true && withinHours ?
         flagValue * BONUS_WITHIN_TIME_LIMIT_MULTIPLIER : // if within time limit, multiply score
         flagValue
@@ -230,6 +238,18 @@ async function submitFlag(flagString, challengeID, discordID, additionalInput, p
     }
 
     return `Flag submission successful! You have gained ${flagValueProc} points.`
+}
+
+async function addPoints(pointsToAdd, challengeID, playerID) {
+    await mongoose.connect(uri);
+    const points = Number(pointsToAdd);
+    
+    const scoreboardUpdateRes = await Scoreboard.findOneAndUpdate({ challengeID: challengeID, playerID: playerID }, { $inc: { scoreValue: points } });
+    if (!scoreboardUpdateRes) {
+        return "User is not registered for this challenge."
+    }
+
+    return `Points modified successfully.`
 }
 
 /**
@@ -272,6 +292,32 @@ async function findChallenge(param) {
             return challenge[0];
         }
     }    
+}
+
+async function findLongAns(longAnsID) {
+    await mongoose.connect(uri);
+
+    try {
+        const paramAsObjectId = new ObjectId(longAnsID);
+        const longAnsById = await LongAnswer.findById(paramAsObjectId);
+        
+        if (longAnsById.length == 0) {
+            throw new Error('Long answer entry not found');
+        } else if (longAnsById.length > 1) {
+            throw new Error("Unexpected behaviour: Multiple long answers found (findLongAns).");
+        }
+        else {
+            return longAnsById;
+        }
+    } catch (err) {
+        if (err.message.startsWith('input must be a 24 character hex string')) {
+            throw new Error("Invalid long answer ID format")
+        }
+        else {
+            // Default error handling
+            throw new Error(err)
+        }
+    }
 }
 
 /**
@@ -322,7 +368,9 @@ module.exports = {
     submitFlag,
     findChallenge,
     createFlag,
+    addPoints,
     findFlag,
     findPlayerName,
-    findScore
+    findScore,
+    findLongAns
 }

@@ -1,4 +1,4 @@
-const { SlashCommandBuilder } = require('discord.js');
+const { SlashCommandBuilder, inlineCode } = require('discord.js');
 const { SUPER_EXTREME_CD } = require('../../CONSTANTS.json');
 const { submitFlag, findChallenge, findPlayerName } = require('../../exports/databaseMethods.js')
 
@@ -58,12 +58,22 @@ module.exports = {
             } else {
                 res = await submitFlag(flag, challenge._id, interaction.user.id, additionalInput)
             }
+
+            const lbUsername = await findPlayerName(interaction.user.id);
             
+            if (res.startsWith("LongAnsID")) {
+                const [_, longAnsID, flagTitle, additionalInput] = res.split('|')
+
+                const longAnswerChannel = await interaction.client.channels.fetch(challenge.longAnsChannelID);
+                longAnswerChannel.send({ content: `New submission (ID ${inlineCode(longAnsID)}) by ${lbUsername} (${interaction.user.id})\n**Puzzle Name: ${flagTitle}** \n ${additionalInput}` })
+
+                res = `Submission of long answer complete. Your submission ID is ${inlineCode(longAnsID)}. Results will be notified via DMs, please ensure the bot can DM you.`
+            }
+
             await interaction.reply(res);
 
             // Log submission in the log channel
             const logChannel = await interaction.client.channels.fetch(challenge.logChannelID);
-            const lbUsername = await findPlayerName(interaction.user.id);
             logChannel.send({ content: `User **${lbUsername}** (${interaction.user.id}) attempted puzzle submission for challenge **${challenge.name}**\nFlag: ${flag}\nPuzzle: ${puzzle_id}\nResponse: ${res}`, ephemeral: false});
             return;
 

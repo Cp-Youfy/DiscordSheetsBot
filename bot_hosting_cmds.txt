@@ -1,0 +1,6 @@
+pm2 start index.js
+pm2 log ID
+pm2 restart ID
+pm2 stop ID
+
+(https://medium.com/geekculture/hosting-node-js-projects-with-digital-ocean-for-linux-or-mac-os-users-3190187dcd1c)

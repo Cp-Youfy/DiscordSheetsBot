@@ -15,6 +15,10 @@ module.exports = {
 	async execute(interaction) {
         try {
             const nameString = interaction.options.getString('name') ?? null;
+            if (!nameString.match('/^([0-9]|[a-z])+([0-9a-z]+)$/i')) {
+                await interaction.reply("Only alphanumeric names are allowed")
+                return;
+            }
             const res = await registerUser(interaction.user.id, nameString, Date.now());
             await interaction.reply(res);
             return;
