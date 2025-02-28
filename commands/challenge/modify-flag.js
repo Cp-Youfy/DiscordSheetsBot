@@ -2,7 +2,7 @@ const { SlashCommandBuilder, ActionRowBuilder, ModalBuilder, TextInputBuilder, T
 const { EASY_CD } = require('../../CONSTANTS.json');
 const { ADMIN_ID } = require('../../config.json')
 const { Flag } = require('../../exports/challengeSchemas.js');
-const { findFlag } = require('../../exports/databaseMethods.js')
+const { findFlag, findChallenge } = require('../../exports/databaseMethods.js')
 
 module.exports = {
     cooldown: EASY_CD,
@@ -37,6 +37,7 @@ module.exports = {
             }
 
             const flagDoc = await findFlag(flagID);
+            const challenge = await findChallenge(flagDoc.challengeID)
 
             // Check if param is valid            
             if (!(['challengeID', 'flag', 'flagTitle', 'flagInfo', 'isLongAns', 'value', 'submissionOpenDate'].includes(flagParam))) {

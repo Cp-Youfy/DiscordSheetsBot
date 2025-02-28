@@ -172,12 +172,14 @@ async function submitFlag(flagString, challengeID, discordID, additionalInput, p
     // Searches with puzzle ID if necessary
     const flagArr = await (puzzle_id === null ? 
         Flag.find({ challengeID: challengeID, flag: flagString }) :
-        Flag.findById(puzzle_id)
+        Flag.find({ challengeID: challengeID, flag: flagString, _id: new ObjectId(puzzle_id) })
     );
     
     if (!flagArr || (Array.isArray(flagArr) && flagArr.length === 0)) {
         return "Wrong flag";
     }
+
+    console.log(flagArr)
 
     const flag = Array.isArray(flagArr) ? flagArr[0] : flagArr;
     const dateCreated = new Date();
@@ -315,7 +317,7 @@ async function findLongAns(longAnsID) {
         }
         else {
             // Default error handling
-            throw new Error(err)
+            throw new Error(err.message)
         }
     }
 }
@@ -345,7 +347,7 @@ async function findFlag(param) {
         }
         else {
             // Default error handling
-            throw new Error(err)
+            throw new Error(err.message)
         }
     }
 }
@@ -361,6 +363,30 @@ async function findScore(challengeID, discordID) {
     }
 }
 
+async function findFlagsByChallengeID(challengeID) {
+    await mongoose.connect(uri);
+
+    // Check if challenge ID is valid
+    try {
+        findChallenge(challengeID);
+    } catch (err) {
+        if (err.message == "Challenge not found.") {
+            return err.message
+        } else {
+            throw new Error(err.message)
+        }
+    };
+
+    // Return list of documents
+    const res = await Flag.find({ challengeID: challengeID });
+
+    if (res.length == 0) {
+        return "No flags found for the specified challenge."
+    } else {
+        return res
+    }
+}
+
 module.exports = {
     registerUser,
     joinChallenge,
@@ -372,5 +398,6 @@ module.exports = {
     findFlag,
     findPlayerName,
     findScore,
-    findLongAns
+    findLongAns,
+    findFlagsByChallengeID
 }

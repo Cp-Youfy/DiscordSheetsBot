@@ -1,6 +1,6 @@
 const { SlashCommandBuilder } = require('discord.js');
 const { HARD_CD, EMBED_COLOUR_GEN } = require('../../CONSTANTS.json');
-const { findFlag } = require('../../exports/databaseMethods.js')
+const { findFlag, findChallenge } = require('../../exports/databaseMethods.js')
 
 module.exports = {
     cooldown: HARD_CD,
@@ -16,12 +16,14 @@ module.exports = {
         try {
             const puzzleID = interaction.options.getString('puzzle_id') ?? null;
             const flag = await findFlag(puzzleID);
+            const challenge = await findChallenge(flag.challengeID)
 
             var embed = {
                 color: EMBED_COLOUR_GEN,
                 title: `Details of puzzle`,
                 description: `
                 **ID** ${flag.id}
+                **Challenge** ${challenge.name}
                 **Name** ${flag.flagTitle}
                 **Description** ${flag.flagInfo}
                 **Point value** ${flag.value}
@@ -33,7 +35,7 @@ module.exports = {
                 (created ${flag.dateCreated})
                 `,
                 footer: {
-                    text: `Requested by ${interaction.user.name}`
+                    text: `Requested by ${interaction.user.username}`
                 },
                 timestamp: new Date().toISOString(),
             };

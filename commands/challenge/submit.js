@@ -1,4 +1,4 @@
-const { SlashCommandBuilder, inlineCode } = require('discord.js');
+const { SlashCommandBuilder, inlineCode, MessageFlags } = require('discord.js');
 const { SUPER_EXTREME_CD } = require('../../CONSTANTS.json');
 const { submitFlag, findChallenge, findPlayerName } = require('../../exports/databaseMethods.js')
 
@@ -70,7 +70,7 @@ module.exports = {
                 res = `Submission of long answer complete. Your submission ID is ${inlineCode(longAnsID)}. Results will be notified via DMs, please ensure the bot can DM you.`
             }
 
-            await interaction.reply(res);
+            await interaction.reply({ content: res, flags: MessageFlags.Ephemeral });
 
             // Log submission in the log channel
             const logChannel = await interaction.client.channels.fetch(challenge.logChannelID);

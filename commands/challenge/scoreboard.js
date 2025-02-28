@@ -1,4 +1,5 @@
 const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
+const { multiPageButtons } = require('../../exports/multiPageConstants.js')
 const { HARD_CD, ENTRIES_PER_PAGE, EMBED_COLOUR_GEN } = require('../../CONSTANTS.json');
 const { findChallenge } = require('../../exports/databaseMethods.js');
 const { Scoreboard, Player } = require('../../exports/challengeSchemas');
@@ -57,25 +58,6 @@ module.exports = {
                     icon_url: interaction.user.displayAvatarURL()
                 }
             }
-        
-          const leaderboardButtons = new ActionRowBuilder()
-            .addComponents(
-              new ButtonBuilder()
-                .setCustomId('prev')
-                .setLabel('PREV')
-                .setStyle(ButtonStyle.Secondary)
-                .setEmoji('⬅️'),
-              new ButtonBuilder()
-                .setCustomId('next')
-                .setLabel('NEXT')
-                .setStyle(ButtonStyle.Secondary)
-                .setEmoji('➡️'),
-              new ButtonBuilder()
-                .setCustomId('mobile')
-                .setLabel('MOBILE')
-                .setStyle(ButtonStyle.Secondary)
-                .setEmoji('📲'),
-            )
 
             await interaction.editReply({ embeds: [leaderboardEmbed] });
             return;
