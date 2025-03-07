@@ -179,8 +179,6 @@ async function submitFlag(flagString, challengeID, discordID, additionalInput, p
         return "Wrong flag";
     }
 
-    console.log(flagArr)
-
     const flag = Array.isArray(flagArr) ? flagArr[0] : flagArr;
     const dateCreated = new Date();
 
@@ -198,13 +196,6 @@ async function submitFlag(flagString, challengeID, discordID, additionalInput, p
         return "Additional input required for this challenge.";
     }
 
-    if (existingSubmission.length == 0) {
-        const flagSubmission = new FlagsObtained({ challengeID: challengeID, playerID: discordID, flag: flagString, dateCreated: dateCreated });
-        await flagSubmission.save();
-    } else {
-        return "Flag has been submitted before";
-    }
-
     if (hasAdditionalInput) {
         if (additionalInput.length > 1800) {
             return "Additional input must be of maximum length 1800 characters. Please attach pastebin link or something similar instead."
@@ -214,6 +205,13 @@ async function submitFlag(flagString, challengeID, discordID, additionalInput, p
         await longAnsSubmission.save();
 
         return `LongAnsID|${longAnsSubmission._id}|${flag.flagTitle}|${additionalInput}`
+    }
+
+    if (existingSubmission.length == 0) {
+        const flagSubmission = new FlagsObtained({ challengeID: challengeID, playerID: discordID, flag: flagString, dateCreated: dateCreated });
+        await flagSubmission.save();
+    } else {
+        return "Flag has been submitted before";
     }
 
     // Adds time limit bonus if applicable

@@ -59,7 +59,11 @@ module.exports = {
             return;
 
         } catch (err) {
-            throw err;
+            if (err.message == 'Challenge not found.') {
+                await interaction.reply(err.message)
+            } else {
+                throw err;
+            }
         }
 	},
 };

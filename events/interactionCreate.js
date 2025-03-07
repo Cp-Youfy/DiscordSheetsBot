@@ -1,4 +1,4 @@
-const { Collection, Events } = require('discord.js');
+const { Collection, Events, MessageFlags } = require('discord.js');
 const { ADMIN_ID, LOG_CHANNEL_ID } = require('../config.json');
 const { EASY_CD } = require('../CONSTANTS.json')
 const { addEntry } = require('../exports/sheetMethods.js');
@@ -69,9 +69,9 @@ module.exports = {
                 console.error(err);
                 logChannel.send({content: `**ERROR [MODAL]** (${interaction.customId}) | ${err}`});
                 if (interaction.replied || interaction.deferred) {
-                    await interaction.followUp({ content: 'There was an error while processing this modal!', ephemeral: true });
+                    await interaction.followUp({ content: 'There was an error while processing this modal!', flags: MessageFlags.Ephemeral });
                 } else {
-                    await interaction.reply({ content: 'There was an error while processing this modal!', ephemeral: true });
+                    await interaction.reply({ content: 'There was an error while processing this modal!', flags: MessageFlags.Ephemeral });
                 }
             }
         }
