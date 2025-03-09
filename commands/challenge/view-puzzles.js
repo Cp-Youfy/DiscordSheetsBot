@@ -34,22 +34,7 @@ module.exports = {
             //  * @param {number} start The index to start from.
             //  * @returns {Promise<MessageEmbed>}
             //  */
-            // const generateEmbed = async start => {
-            // const current = guilds.slice(start, start + 10)
 
-            // // You can of course customise this embed however you want
-            // return new MessageEmbed({
-            //     title: `Showing guilds ${start + 1}-${start + current.length} out of ${
-            //     guilds.length
-            //     }`,
-            //     fields: await Promise.all(
-            //     current.map(async guild => ({
-            //         name: guild.name,
-            //         value: `**ID:** ${guild.id}\n**Owner:** ${(await guild.fetchOwner()).user.tag}`
-            //     }))
-            //     )
-            // })
-            // }
 
             // // Send the embed with the first 10 guilds
             // const canFitOnOnePage = guilds.length <= 10
