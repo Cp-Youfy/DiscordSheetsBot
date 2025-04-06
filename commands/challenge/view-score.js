@@ -22,7 +22,7 @@ module.exports = {
             return;
 
         } catch (err) {
-            if (err.message == "Scoreboard entry does not exist. Have you joined the challenge?" || err.message == "Challenge not found") {
+            if (err.message == "Scoreboard entry does not exist. Have you joined the challenge?" || err.message == "Challenge not found.") {
                 await interaction.reply(err.message);
                 return;
             } else {

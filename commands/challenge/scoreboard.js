@@ -31,7 +31,6 @@ module.exports = {
             const challenge = await findChallenge(challengeID);
             const scoreboardData = await Scoreboard.find({ challengeID: challenge._id }).sort({ scoreValue: 'desc' });
             var page = 0;
-            var scoreboardText = "";
             const embedArr = [];
             const toShowId = !challenge.isHiddenID
             

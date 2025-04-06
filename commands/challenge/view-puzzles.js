@@ -77,7 +77,9 @@ module.exports = {
             if (err.message == 'Invalid flag ID format') {
                 await interaction.reply("Invalid puzzle ID format");
             } else if (err.message == 'Flag not found') {
-                await interaction.reply("Puzzle not found")
+                await interaction.reply("Puzzle not found");
+            } else if (err.message == 'Challenge not found.') {
+                await interaction.reply(err.message);
             } else {
                 // Default error handling
                 throw new Error(err)

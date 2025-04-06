@@ -253,6 +253,32 @@ async function addPoints(pointsToAdd, challengeID, playerID) {
 }
 
 /**
+ * 
+ * @param {String} challengeID Challenge ID (use findChallenge first) -- Case-sensitive
+ * @param {String} playerID Discord ID of user
+ */
+async function findSubmissions(challengeID, playerID) {
+    await mongoose.connect(uri);
+    const flagArr = await FlagsObtained.find(
+        { challengeID: challengeID, playerID: playerID }, 
+        { flag: 1, _id: 0 }
+    );
+
+    const cleanFlagArr = flagArr.map(flag => flag.flag);
+
+    if (cleanFlagArr.length === 0) {
+        return [];
+    }
+
+    const flagInfoArr = await Flag.find(
+        { challengeID: challengeID, flag: { $in: cleanFlagArr } },
+        { _id: 1, flagInfo: 1 }
+    )
+
+    return flagInfoArr;
+}
+
+/**
  * Looks up the challenge from MongoDB by its name or id and returns it as a mongoose.Document object.
  * If not found, throw an error (for response via error handling)
  * @param {String} param Challenge name or ID (if known) -- Case-sensitive
@@ -361,6 +387,22 @@ async function findScore(challengeID, discordID) {
     }
 }
 
+async function addLongAnsObtained(challengeID, discordID, flagString) {
+    await mongoose.connect(uri);
+
+    const dateCreated = new Date();
+    const existingSubmission = await FlagsObtained.find({ challengeID: challengeID, playerID: discordID, flag: flagString });
+
+    if (existingSubmission.length == 0) {
+        const flagSubmission = new FlagsObtained({ challengeID: challengeID, playerID: discordID, flag: flagString, dateCreated: dateCreated });
+        await flagSubmission.save();
+        return;
+    } else {
+        // Save long answer obtained only once
+        return "Flag has been submitted before";
+    }
+}
+
 async function findFlagsByChallengeID(challengeID) {
     await mongoose.connect(uri);
 
@@ -397,5 +439,7 @@ module.exports = {
     findPlayerName,
     findScore,
     findLongAns,
-    findFlagsByChallengeID
+    findFlagsByChallengeID,
+    findSubmissions,
+    addLongAnsObtained
 }

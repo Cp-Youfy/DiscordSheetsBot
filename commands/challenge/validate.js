@@ -1,6 +1,6 @@
 const { SlashCommandBuilder } = require('discord.js');
 const { EXTREME_CD, EMBED_COLOUR_GEN } = require('../../CONSTANTS.json');
-const { addPoints, findLongAns, findFlag, findChallenge } = require('../../exports/databaseMethods.js')
+const { addPoints, findLongAns, findFlag, findChallenge, addLongAnsObtained } = require('../../exports/databaseMethods.js')
 
 module.exports = {
     cooldown: EXTREME_CD,
@@ -54,6 +54,11 @@ module.exports = {
             if (feedback.length > 1800) {
                 await interaction.reply("Feedback must be 1800 characters or less.");
                 return;
+            }
+
+            if (pointsToAdd !== 0) {
+                // successful submission
+                await addLongAnsObtained(challengeID, playerID, flag.flag);
             }
 
             const res = await addPoints(pointsToAdd, challengeID, playerID);
