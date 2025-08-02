@@ -3,7 +3,10 @@
 	"MEDIUM_CD": 5,
 	"HARD_CD": 10,
 	"EXTREME_CD": 30,
+	"INTERACTION_DURATION": 60000,
 	"SUPER_EXTREME_CD": 60,
-	"ENTRIES_PER_PAGE": 10,
-	"EMBED_COLOUR_GEN": 15921355
+	"ENTRIES_PER_PAGE": 5,
+	"EMBED_COLOUR_GEN": 15921355,
+	"INVITE_LINK": "https://discord.com/oauth2/authorize?client_id=1304832313556865106&permissions=8&integration_type=0&scope=bot+applications.commands",
+	"BOT_NAME": "SbiboBot"
 }

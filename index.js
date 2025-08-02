@@ -69,7 +69,7 @@ client.login(token);
 // }
 
 client.on("ready", () => {
-	client.user.setActivity('PuzzleMarch', { type: ActivityType.Competing });
+	client.user.setActivity('bass', { type: ActivityType.Playing });
 	// updateBanner('https://i.imgur.com/zuezb5Z.png'); // https://i.imgur.com/zuezb5Z.png;
 });
 

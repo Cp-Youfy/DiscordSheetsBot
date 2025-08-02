@@ -1,6 +1,6 @@
 const { SlashCommandBuilder } = require('discord.js');
 const { EXTREME_CD } = require('../../CONSTANTS.json');
-const { ADMIN_ID } = require('../../config.json')
+const { ADMIN_IDS } = require('../../config.json')
 const { addPoints, findChallenge } = require('../../exports/databaseMethods.js')
 
 module.exports = {
@@ -38,7 +38,7 @@ module.exports = {
                 return false;
             }
             
-            if (interaction.user.id != ADMIN_ID && interaction.user.id != challenge.organiser) {
+            if (!!!ADMIN_IDS.includes(interaction.user.id) && interaction.user.id != challenge.organiser) {
                 await interaction.reply("Only the challenge organiser or bot owner can modify points.");
                 return;
             }

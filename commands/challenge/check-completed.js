@@ -1,6 +1,6 @@
 const { SlashCommandBuilder } = require('discord.js');
 const { HARD_CD } = require('../../CONSTANTS.json');
-const { ADMIN_ID } = require('../../config.json')
+const { ADMIN_IDS } = require('../../config.json')
 const { findChallenge, findSubmissions, findPlayerName } = require('../../exports/databaseMethods.js')
 
 module.exports = {

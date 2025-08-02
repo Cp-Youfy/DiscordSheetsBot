@@ -1,5 +1,5 @@
 const { SlashCommandBuilder, ActionRowBuilder, ModalBuilder, TextInputBuilder, TextInputStyle } = require('discord.js');
-const { ADMIN_ID } = require('../../config.json');
+const { ADMIN_IDS } = require('../../config.json');
 const { HARD_CD, EMBED_COLOUR_GEN } = require('../../CONSTANTS.json')
 const { findChallenge, joinChallenge } = require('../../exports/databaseMethods.js')
 
@@ -34,7 +34,7 @@ module.exports = {
         const param2 = interaction.options.getString('param2') ?? null;
         const param3 = interaction.options.getString('param3') ?? null;
         if (option == 'create') {
-            if (interaction.user.id != ADMIN_ID) {
+            if (!ADMIN_IDS.includes(interaction.user.id)) {
                 // Handled under interactionCreate.js
                 throw new Error("BotOwnerOnly");
             }
@@ -111,7 +111,7 @@ module.exports = {
             }
             try {
                 const challenge = await findChallenge(param1);
-                if (interaction.user.id != challenge.organiser && interaction.user.id != ADMIN_ID) {
+                if (interaction.user.id != challenge.organiser && !ADMIN_IDS.includes(interaction.user.id)) {
                     await interaction.reply("Only the challenge organiser or bot owner can modify challenge fields.");
                     return;
                 }

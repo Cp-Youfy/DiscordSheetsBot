@@ -1,6 +1,6 @@
 const { SlashCommandBuilder, ActionRowBuilder, ModalBuilder, TextInputBuilder, TextInputStyle } = require('discord.js');
 const { EASY_CD } = require('../../CONSTANTS.json');
-const { ADMIN_ID } = require('../../config.json')
+const { ADMIN_IDS } = require('../../config.json')
 const { Flag } = require('../../exports/challengeSchemas.js');
 const { findFlag, findChallenge } = require('../../exports/databaseMethods.js')
 
@@ -45,7 +45,7 @@ module.exports = {
                 return;
             }
             
-            if (interaction.user.id != ADMIN_ID && interaction.user.id != challenge.organiser) {
+            if (!ADMIN_IDS.includes(interaction.user.id) && interaction.user.id != challenge.organiser) {
                 await interaction.reply("Only the challenge organiser or bot owner can modify puzzles.");
                 return;
             }

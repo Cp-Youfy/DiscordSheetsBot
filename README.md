@@ -27,8 +27,11 @@ node deploy-commands.js
 
 `index.js` and `deploy-commands.js` is template code copied from the [discord.js guide](https://discordjs.guide/#before-you-begin). It's a very helpful guide!
 
+# CONSTANTS.json
+Do change: `INVITE_LINK`, `BOT_NAME`. Everything else can be kept constant. CDs are in seconds and anything above 100 is likely in milliseconds, but you can look it up based on its usage.
+
 # config.json
-You need to create a `config.json` file in the root directory. It is very important to keep this file secret, especially your bot token; don't commit the file to GitHub! Feel free to change the cooldowns (CD / seconds) to suit your needs, but note that the `ADMIN_ID` user is immune to the cooldowns. With the current code, here are the variables you will need to define:
+You need to create a `config.json` file in the root directory. It is very important to keep this file secret, especially your bot token; don't commit the file to GitHub! Feel free to change the cooldowns (CD / seconds) to suit your needs, but note that `ADMIN_IDS` users is immune to the cooldowns. With the current code, here are the variables you will need to define:
 
 ```json
 {
@@ -38,7 +41,7 @@ You need to create a `config.json` file in the root directory. It is very import
 	"DM_CHANNEL_ID": "<your-bot-dm-channel-id>",
 	"LOG_CHANNEL_ID": "<your-bot-commands-logging-channel-id>",
 	"BOT_USER_ID": "<your-bot-user-id>",
-	"ADMIN_ID": "<your-id-for-bot-owner-only-commands>",
+	"ADMIN_IDS": ["<your-id-for-bot-owner-only-commands>", "<other_allowed_ids>"],
 	"SHEETS_API_LINK": "<your-sheetdb-api-link>",
 	"DATABASE_USERNAME": "<your-mongodb-username>",
 	"DATABASE_PASSWORD": "<your-mongodb-password>",

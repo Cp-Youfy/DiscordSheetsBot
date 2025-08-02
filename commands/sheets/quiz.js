@@ -1,5 +1,5 @@
 const { ButtonBuilder, ButtonStyle, ActionRowBuilder, SlashCommandBuilder } = require('discord.js');
-const { EASY_CD, EMBED_COLOUR_GEN } = require('../../CONSTANTS.json');
+const { EASY_CD, EMBED_COLOUR_GEN, INTERACTION_DURATION } = require('../../CONSTANTS.json');
 const emojiCharacters = require('../../exports/emojiCharacters.js')
 const { getEntry } = require('../../exports/sheetMethods.js');
 
@@ -73,7 +73,7 @@ module.exports = {
         const collectorFilter = i => i.user.id === interaction.user.id;
 
         try {
-            const confirmation = await userRes.awaitMessageComponent({ filter: collectorFilter, time: 60_000 });
+            const confirmation = await userRes.awaitMessageComponent({ filter: collectorFilter, time: INTERACTION_DURATION });
             
             if (confirmation.customId === `option${correctOption + 1}`) {
                 embed.fields.push({ name: "Result", value: "**Answer is correct!**"})

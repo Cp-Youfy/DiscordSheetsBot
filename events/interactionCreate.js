@@ -1,8 +1,8 @@
 const { Collection, Events, MessageFlags } = require('discord.js');
-const { ADMIN_ID, LOG_CHANNEL_ID } = require('../config.json');
+const { ADMIN_IDS, LOG_CHANNEL_ID } = require('../config.json');
 const { EASY_CD } = require('../CONSTANTS.json')
 const { addEntry } = require('../exports/sheetMethods.js');
-const { createChallenge, joinChallenge, createFlag } = require('../exports/databaseMethods.js')
+const { createChallenge, createFlag } = require('../exports/databaseMethods.js')
 
 module.exports = {
 	name: Events.InteractionCreate,
@@ -11,7 +11,18 @@ module.exports = {
         const logChannel = await interaction.client.channels.fetch(LOG_CHANNEL_ID);
 
         if (interaction.member != null) {
-            logChannel.send({content: `User ${interaction.member.user.username} (ID: ${interaction.member.user.id}) used command ${interaction.commandName} in server ${interaction.guild.name} (ID: ${interaction.guild.id})`});
+            if (interaction.commandName) {
+                logChannel.send({content: `User ${interaction.member.user.username} (ID: ${interaction.member.user.id}) used command ${interaction.commandName} in server ${interaction.guild.name} (ID: ${interaction.guild.id})`});
+            } else {
+                // Not a command (e.g. modal, button)
+                if (interaction.isButton()) {
+                    logChannel.send({content: `User ${interaction.member.user.username} (ID: ${interaction.member.user.id}) used button ${interaction.customId} in server ${interaction.guild.name} (ID: ${interaction.guild.id})`})
+                }
+                
+                if (interaction.isModalSubmit()) {
+                    logChannel.send({content: `User ${interaction.member.user.username} (ID: ${interaction.member.user.id}) submitted modal ${interaction.customId} in server ${interaction.guild.name} (ID: ${interaction.guild.id})`})
+                }
+            }
         }
         else { // DMs
             logChannel.send({content: `User ${interaction.user.username} (ID: ${interaction.user.id}) used command ${interaction.commandName} in DMs`});
@@ -86,7 +97,7 @@ module.exports = {
             return;
         }
 
-        if (interaction.commandName.startsWith('o-') && interaction.user.id != ADMIN_ID) {
+        if (interaction.commandName.startsWith('o-') && !ADMIN_IDS.includes(interaction.user.id)) {
             await interaction.reply({ content: 'Only bot admin can use this command!', ephemeral: true })
             return;
         }
@@ -94,8 +105,8 @@ module.exports = {
         // Handle command cooldowns
         const { cooldowns } = interaction.client;
 
-        // ADMIN_ID immune to cooldown
-        if (interaction.user.id != ADMIN_ID) {
+        // ADMIN_IDS immune to cooldown
+        if (!ADMIN_IDS.includes(interaction.user.id)) {
             // If command not already on cooldown, add a new entry to the cooldowns Collection
             if (!cooldowns.has(command.data.name)) {
                 cooldowns.set(command.data.name, new Collection());

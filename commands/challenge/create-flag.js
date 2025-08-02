@@ -1,6 +1,6 @@
 const { SlashCommandBuilder, ActionRowBuilder, ModalBuilder, TextInputBuilder, TextInputStyle } = require('discord.js');
 const { EASY_CD } = require('../../CONSTANTS.json');
-const { ADMIN_ID } = require('../../config.json')
+const { ADMIN_IDS } = require('../../config.json')
 const { findChallenge } = require('../../exports/databaseMethods.js')
 
 module.exports = {
@@ -24,7 +24,7 @@ module.exports = {
 
             const challenge = await findChallenge(challengeID);
             // Sanitising challengeID to avoid directly putting user input into modal custom ID
-            if (interaction.user.id != ADMIN_ID && interaction.user.id != challenge.organiser) {
+            if (!ADMIN_IDS.includes(interaction.user.id) && interaction.user.id != challenge.organiser) {
                 await interaction.reply("Only the challenge organiser or bot owner can add puzzles.");
                 return;
             }
