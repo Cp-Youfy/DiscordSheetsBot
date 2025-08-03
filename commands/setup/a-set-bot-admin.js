@@ -38,20 +38,6 @@ module.exports = {
             }
         }
 
-        function getUserFromMention(mention) {
-            if (!mention) return;
-
-            if (mention.startsWith('<@') && mention.endsWith('>')) {
-                mention = mention.slice(2, -1);
-
-                if (mention.startsWith('!')) {
-                    mention = mention.slice(1);
-                }
-
-                return client.users.cache.get(mention);
-            }
-        }
-
         // Parse mention if it was a role mention: https://v13.discordjs.guide/miscellaneous/parsing-mention-arguments.html#how-discord-mentions-work (role pings are in the form <@&...>)
         if (roleID.startsWith('<@&') && roleID.endsWith('>')) {
             roleID = roleID.slice(3, -1);
