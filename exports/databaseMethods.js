@@ -1,13 +1,36 @@
+/*
+Contains all database interaction methods, by interacting with:
+- challengeSchemas.js
+- serverSchemas.js
+*/
+
 const mongoose = require('mongoose');
 const { ObjectId } = require('mongodb');
 const { inlineCode } = require('discord.js');
 const { BONUS_WITHIN_TIME_LIMIT, BONUS_WITHIN_TIME_LIMIT_MULTIPLIER, FIRST_BLOOD_ADDITIONAL_POINTS } = require('./CHALLENGE_CONSTANTS.json')
 const assert = require('assert');
-const { DATABASE_USERNAME, DATABASE_PASSWORD, DATABASE_NAME, DEFAULT_CHANNEL_LOG_ID } = require('../config.json');
-const { Challenge, Player, FlagsObtained, Flag, Scoreboard, LongAnswer } = require('./challengeSchemas.js');
+const { DATABASE_USERNAME, DATABASE_PASSWORD, DEFAULT_CHANNEL_LOG_ID } = require('../config.json');
+const { challengeSchema, playerSchema, flagsObtainedSchema, flagSchema, scoreboardSchema, longAnswerSchema } = require('./challengeSchemas.js');
+const { DATABASE_NAME_CHALLENGE, DATABASE_NAME_SERVER } = require('../CONSTANTS.json')
+const { serverBotAdminSchema } = require('./serverSchemas.js');
 
-const uri = `mongodb+srv://${DATABASE_USERNAME}:${DATABASE_PASSWORD}@challenge.g4x9t.mongodb.net/${DATABASE_NAME}?retryWrites=true&w=majority&appName=challenge`;
+/* ------- ESTABLISH CONNECTION ------- */
+const uriChallenge = `mongodb+srv://${DATABASE_USERNAME}:${DATABASE_PASSWORD}@challenge.g4x9t.mongodb.net/${DATABASE_NAME_CHALLENGE}?retryWrites=true&w=majority&appName=challenge`;
+const uriServer = `mongodb+srv://${DATABASE_USERNAME}:${DATABASE_PASSWORD}@challenge.g4x9t.mongodb.net/${DATABASE_NAME_SERVER}?retryWrites=true&w=majority&appName=challenge`;
 
+const challengeConnection = mongoose.createConnection(uriChallenge);
+const serverConnection = mongoose.createConnection(uriServer);
+
+// Models (ModelName, schema) [collectionName was overwritten in schema definition so it's OK]
+const Challenge = challengeConnection.model('Challenge', challengeSchema);
+const Player = challengeConnection.model('Player', playerSchema);
+const FlagsObtained = challengeConnection.model('FlagsObtained', flagsObtainedSchema);
+const Flag = challengeConnection.model('Flag', flagSchema);
+const Scoreboard = challengeConnection.model('Scoreboard', scoreboardSchema);
+const LongAnswer = challengeConnection.model('LongAnswer', longAnswerSchema);
+const ServerBotAdmin = serverConnection.model('ServerBotAdmin', serverBotAdminSchema);
+
+/* ------- CHALLENGE METHODS ------- */
 /**
  * 
  * @param {String} discordID 
@@ -16,8 +39,6 @@ const uri = `mongodb+srv://${DATABASE_USERNAME}:${DATABASE_PASSWORD}@challenge.g
  * @returns 
  */
 async function registerUser(discordID, name, registrationDate) {
-    await mongoose.connect(uri);
-
     const existingPlayer = await Player.findById(discordID);
     if (!existingPlayer) {
         const dateCreated = new Date();
@@ -38,7 +59,6 @@ async function registerUser(discordID, name, registrationDate) {
  * @param {Boolean} isLongAns 
  */
 async function createFlag(challengeID, flag, flagTitle, flagInfo, value, submissionOpenDate) { 
-    await mongoose.connect(uri);
     const dateCreated = new Date();
 
     // Attempts typecasting to date
@@ -66,8 +86,6 @@ async function createFlag(challengeID, flag, flagTitle, flagInfo, value, submiss
  * @returns {String} playerName
  */
 async function findPlayerName(discordID) {
-    await mongoose.connect(uri);
-
     const playerDoc = await Player.find({ _id: discordID });
     if (playerDoc.length == 0) {
         throw new Error("Player not found");
@@ -84,8 +102,6 @@ async function findPlayerName(discordID) {
  * @returns 
  */
 async function joinChallenge(challengeID, discordID) {
-    await mongoose.connect(uri);
-
     const dateCreated = new Date();
     const existingPlayer = await Scoreboard.find({ challengeID: challengeID, playerID: discordID });
     const challenge = await findChallenge(challengeID) // throws error if not found
@@ -126,7 +142,7 @@ async function createChallenge(name, organiser, startDate, duration, longAnsChan
         const inputStartDate = new Date(startDate);
         const inputDuration = Number(duration);
         const dateCreated = new Date();
-        await mongoose.connect(uri);
+
         // Some params have default values but can be modified
         // it is not in the modal due to the numFields <= 5 Discord API restriction
         const challenge = new Challenge({ name: name, organiser: organiser, startDate: inputStartDate, duration: inputDuration, isHiddenID: true, longAnsChannelID: longAnsChannelID, isOpen: false, isTargeted: false, isBonusTimeLimit: false, isFirstBlood: false, dateCreated: dateCreated, logChannelID: DEFAULT_CHANNEL_LOG_ID, puzzleMakerID: '123456789012456789' });
@@ -154,8 +170,6 @@ async function createChallenge(name, organiser, startDate, duration, longAnsChan
  * @returns {String}
  */
 async function submitFlag(flagString, challengeID, discordID, additionalInput, puzzle_id=null) {
-    await mongoose.connect(uri);
-
     const scoreboardPlayer = await Scoreboard.find({ challengeID: challengeID, playerID: discordID });
     if (scoreboardPlayer.length == 0) {
         const challengeIdAsObjectId = new ObjectId(challengeID)
@@ -241,7 +255,6 @@ async function submitFlag(flagString, challengeID, discordID, additionalInput, p
 }
 
 async function addPoints(pointsToAdd, challengeID, playerID) {
-    await mongoose.connect(uri);
     const points = Number(pointsToAdd);
     
     const scoreboardUpdateRes = await Scoreboard.findOneAndUpdate({ challengeID: challengeID, playerID: playerID }, { $inc: { scoreValue: points } });
@@ -258,7 +271,6 @@ async function addPoints(pointsToAdd, challengeID, playerID) {
  * @param {String} playerID Discord ID of user
  */
 async function findSubmissions(challengeID, playerID) {
-    await mongoose.connect(uri);
     const flagArr = await FlagsObtained.find(
         { challengeID: challengeID, playerID: playerID }, 
         { flag: 1, _id: 0 }
@@ -284,7 +296,6 @@ async function findSubmissions(challengeID, playerID) {
  * @param {String} param Challenge name or ID (if known) -- Case-sensitive
  */
 async function findChallenge(param) {
-    await mongoose.connect(uri);
     // first search by id
     try {
         const paramAsObjectId = new ObjectId(param);
@@ -295,7 +306,7 @@ async function findChallenge(param) {
         if (challengeById.length == 0) {
             const challenge = await Challenge.find({ name: param });
             if (challenge.length == 0) {
-                throw new Error("Challenge not found");
+                throw new Error("Challenge not found.");
             } else if (challenge.length > 1) {
                 throw new Error(multipleChallengesErrMsg);
             } else {
@@ -321,8 +332,6 @@ async function findChallenge(param) {
 }
 
 async function findLongAns(longAnsID) {
-    await mongoose.connect(uri);
-
     try {
         const paramAsObjectId = new ObjectId(longAnsID);
         const longAnsById = await LongAnswer.findById(paramAsObjectId);
@@ -352,7 +361,6 @@ async function findLongAns(longAnsID) {
  * @param {String} param Flag ID
  */
 async function findFlag(param) {
-    await mongoose.connect(uri);
     try {
         const paramAsObjectId = new ObjectId(param);
         const flagById = await Flag.findById(paramAsObjectId);
@@ -377,8 +385,6 @@ async function findFlag(param) {
 }
 
 async function findScore(challengeID, discordID) {
-    await mongoose.connect(uri);
-
     const res = await Scoreboard.find({ challengeID: challengeID.toString(), playerID: discordID });
     if (res.length == 0) {
         throw new Error("Scoreboard entry does not exist. Have you joined the challenge?")
@@ -388,8 +394,6 @@ async function findScore(challengeID, discordID) {
 }
 
 async function addLongAnsObtained(challengeID, discordID, flagString) {
-    await mongoose.connect(uri);
-
     const dateCreated = new Date();
     const existingSubmission = await FlagsObtained.find({ challengeID: challengeID, playerID: discordID, flag: flagString });
 
@@ -404,8 +408,6 @@ async function addLongAnsObtained(challengeID, discordID, flagString) {
 }
 
 async function findFlagsByChallengeID(challengeID) {
-    await mongoose.connect(uri);
-
     // Check if challenge ID is valid
     try {
         findChallenge(challengeID);
@@ -427,6 +429,51 @@ async function findFlagsByChallengeID(challengeID) {
     }
 }
 
+/* ------- SERVER METHODS ------- */
+/**
+ * Adds a new entry for server bot admin, or updates the existing entry if it exists.
+ * Do check that the corresponding role for the roleID exists first.
+ * @param {String | null} roleID Role ID of the server bot admin
+ * @returns Document after update
+ */
+async function addServerBotAdmin(serverID, roleID) {
+    const serverBotAdminEntry = await ServerBotAdmin.find({ serverID: serverID })
+
+    if (roleID == null) {
+        // Clear the entry if it exists and returns the document deleted or null if not found
+        res = await ServerBotAdmin.findOneAndDelete({ serverID: serverID })
+        return res
+    }
+
+    if (serverBotAdminEntry.length === 0) {
+        // No entry currently exists
+        const serverBotAdminSubmission = new ServerBotAdmin({ serverID: serverID, roleID: roleID });
+        await serverBotAdminSubmission.save();
+        return serverBotAdminSubmission;
+    } else {
+        // Update existing entry
+        const serverBotAdminUpdateRes = await ServerBotAdmin.findOneAndUpdate({ serverID: serverID }, { $set: { roleID: roleID }}, { new: true });
+        // Returns the updated document
+        return serverBotAdminUpdateRes;
+    }
+
+}
+
+/**
+ * Finds the role ID of the server admin
+ * @param {String} serverID ID of server to find admin ID for
+ * @returns {String | null} roleID
+ */
+async function findServerBotAdmin(serverID) {
+    const serverBotAdminEntry = await ServerBotAdmin.find({ serverID: serverID });
+    if (serverBotAdminEntry.length === 0) {
+        // No entry currently exists
+        return null;
+    } else {
+        return serverBotAdminEntry[0].roleID;
+    }
+}
+
 module.exports = {
     registerUser,
     joinChallenge,
@@ -441,5 +488,7 @@ module.exports = {
     findLongAns,
     findFlagsByChallengeID,
     findSubmissions,
-    addLongAnsObtained
+    addLongAnsObtained,
+    addServerBotAdmin,
+    findServerBotAdmin
 }

@@ -1,8 +1,8 @@
-const { Collection, Events, MessageFlags } = require('discord.js');
+const { Collection, Events, MessageFlags, PermissionsBitField, inlineCode } = require('discord.js');
 const { ADMIN_IDS, LOG_CHANNEL_ID } = require('../config.json');
 const { EASY_CD } = require('../CONSTANTS.json')
 const { addEntry } = require('../exports/sheetMethods.js');
-const { createChallenge, createFlag } = require('../exports/databaseMethods.js')
+const { createChallenge, createFlag, addServerBotAdmin, findServerBotAdmin } = require('../exports/databaseMethods.js')
 
 module.exports = {
 	name: Events.InteractionCreate,
@@ -97,9 +97,35 @@ module.exports = {
             return;
         }
 
+        /* ------- PERMISSION CHECKS ------- */
         if (interaction.commandName.startsWith('o-') && !ADMIN_IDS.includes(interaction.user.id)) {
             await interaction.reply({ content: 'Only bot admin can use this command!', ephemeral: true })
             return;
+        }
+
+        if (interaction.commandName.startsWith('a-') && !interaction.member.permissions.has(PermissionsBitField.Flags.Administrator)) {
+            await interaction.reply({ content: 'Only users with Administrator permissions in this server can use this command!', ephemeral: true })
+            return;
+        }
+
+        if (interaction.commandName.startsWith('b-') && !interaction.member.permissions.has(PermissionsBitField.Flags.Administrator)) {
+            // Checks database for bot administrator role
+            const roleID = await findServerBotAdmin(interaction.guild.id);
+            if (!roleID) {
+                // Not set: Prompt to set
+                await interaction.reply({ content: `Only users with the server's designated BotAdmin role or Administrator permissions can use this command! The role ID for this server is not set. It must be set by a user with Administrator permissions using ${inlineCode('/a-set-bot-admin')} command.`});
+                return;
+            } else {
+                if (!interaction.guild.roles.cache.get(roleID)) {
+                    // The role was deleted, let's clean it and let the user know
+                    await addServerBotAdmin(interaction.guild.id, null)
+                    await interaction.reply({ content: `Only users with the server's designated BotAdmin role or Administrator permissions in this server can use this command! The previous designated role is invalid (perhaps deleted) and has been deleted from the database. It must be set again by a user with Administrator permissions using ${inlineCode('/a-set-bot-admin')} command.` })
+                    return;
+                } else {
+                    await interaction.reply({ content: `Only users with <@&${roleID}> role or Administrator permissions in this server can use this command!`, ephemeral: true })
+                    return;
+                }
+            }
         }
 
         // Handle command cooldowns

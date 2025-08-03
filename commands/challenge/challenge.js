@@ -1,7 +1,7 @@
 const { SlashCommandBuilder, ActionRowBuilder, ModalBuilder, TextInputBuilder, TextInputStyle } = require('discord.js');
 const { ADMIN_IDS } = require('../../config.json');
-const { HARD_CD, EMBED_COLOUR_GEN } = require('../../CONSTANTS.json')
-const { findChallenge, joinChallenge } = require('../../exports/databaseMethods.js')
+const { HARD_CD, EMBED_COLOUR_GEN } = require('../../CONSTANTS.json');
+const { findChallenge, joinChallenge } = require('../../exports/databaseMethods.js');
 
 module.exports = {
     cooldown: HARD_CD,

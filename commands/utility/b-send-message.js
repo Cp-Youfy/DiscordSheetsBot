@@ -4,8 +4,9 @@ const { EASY_CD, INTERACTION_DURATION } = require('../../CONSTANTS.json');
 module.exports = {
 	cooldown: EASY_CD,
 	data: new SlashCommandBuilder()
-		.setName('send-message')
-		.setDescription('Sends a message in the specified channel via the bot.')
+		.setName('b-send-message')
+		// Checks done in interactionCreate.js
+		.setDescription('(BOT_ADMINISTRATOR) Sends a message in the specified channel via the bot.')
 		.addStringOption(option =>
             option.setName('channelid')
                 .setDescription('Channel ID')

@@ -88,18 +88,18 @@ const longAnswerSchema = new mongoose.Schema({
     collection: 'longAnswers'
 })
 
-const Challenge = mongoose.model('Challenge', challengeSchema);
-const Player = mongoose.model('Player', playerSchema);
-const FlagsObtained = mongoose.model('FlagsObtained', flagsObtainedSchema);
-const Flag = mongoose.model('Flag', flagSchema);
-const Scoreboard = mongoose.model('Scoreboard', scoreboardSchema);
-const LongAnswer = mongoose.model('LongAnswer', longAnswerSchema)
+// const Challenge = mongoose.model('Challenge', challengeSchema);
+// const Player = mongoose.model('Player', playerSchema);
+// const FlagsObtained = mongoose.model('FlagsObtained', flagsObtainedSchema);
+// const Flag = mongoose.model('Flag', flagSchema);
+// const Scoreboard = mongoose.model('Scoreboard', scoreboardSchema);
+// const LongAnswer = mongoose.model('LongAnswer', longAnswerSchema)
 
 module.exports = {
-    Challenge: Challenge,
-    Player: Player,
-    FlagsObtained: FlagsObtained,
-    Flag: Flag, 
-    Scoreboard: Scoreboard,
-    LongAnswer: LongAnswer
+    challengeSchema,
+    playerSchema,
+    flagsObtainedSchema,
+    flagSchema,
+    scoreboardSchema,
+    longAnswerSchema
 }

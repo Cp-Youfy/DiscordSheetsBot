@@ -8,5 +8,7 @@
 	"ENTRIES_PER_PAGE": 5,
 	"EMBED_COLOUR_GEN": 15921355,
 	"INVITE_LINK": "https://discord.com/oauth2/authorize?client_id=1304832313556865106&permissions=8&integration_type=0&scope=bot+applications.commands",
-	"BOT_NAME": "SbiboBot"
+	"BOT_NAME": "SbiboBot",
+	"DATABASE_NAME_CHALLENGE": "challenge",
+	"DATABASE_NAME_SERVER": "server"
 }
