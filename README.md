@@ -3,7 +3,7 @@ This repository stores my discordjs bot that I use to pick up Javascript. The co
 Beyond the standalone functions, it has two main features:<br>
 1) [Sheets](commands/sheets)<br>
 The bot can add to, and quiz the user on, words from a Google Sheets vocabulary list. It uses [SheetDB](https://sheetdb.io/) which allows 500 free requests per month.
-2) [Challenges](commands/challenge) \[WIP\]<br>
+2) [Challenges](commands/challenge) <br>
 The bot can create challenges that can be played in as long as the bot is online. It stores the data of users' scores, available challenges, etc. using [MongoDB](https://www.mongodb.com/). Users can submit "flags" (answers) to gain points -- it is similar to the structure of a CTF. You can look at the [schemas](exports/challengeSchemas.js) for more information.
 
 # Setup
