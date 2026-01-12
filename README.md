@@ -8,12 +8,24 @@ The bot can create challenges that can be played in as long as the bot is online
 
 # Setup
 You may `git clone` the repository and use the bot for any **personal** purposes if it is useful.<br>
+
+## Docker
+You can run the code in a docker container. Using compose includes refreshes upon changes and automatic code updates. Run the command in the project's root directory.
+
+```bash
+docker compose up
+```
+or
+```bash
+docker build -t sbibobot .
+docker run sbibobot
+```
+
+## Direct
 Installation of dependencies should be done first via
 ```bash
 npm install
 ```
-
-You should set up the `config.json` file first before trying to run the bot, or it will fail. Refer to the section below.
 
 To log in to the bot, by opening a terminal in the root directory,
 ```bash
@@ -31,6 +43,9 @@ node deploy-commands.js
 Do change: `INVITE_LINK`, `BOT_NAME`. Everything else can be kept constant. CDs are in seconds and anything above 100 is likely in milliseconds, but you can look it up based on its usage.
 
 # config.json
+Resolves
+```Error: Cannot find module './config.json'```
+
 You need to create a `config.json` file in the root directory. It is very important to keep this file secret, especially your bot token; don't commit the file to GitHub! Feel free to change the cooldowns (CD / seconds) to suit your needs, but note that `ADMIN_IDS` users is immune to the cooldowns. With the current code, here are the variables you will need to define:
 
 ```json
@@ -49,4 +64,3 @@ You need to create a `config.json` file in the root directory. It is very import
 	"DEFAULT_CHANNEL_LOG_ID": "<default-channel-for-sending-channel-logs>",
 }
 ```
-
