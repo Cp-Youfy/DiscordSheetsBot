@@ -5,9 +5,10 @@ const { ActivityType, Client, Collection, GatewayIntentBits, Partials, ChannelTy
 const { token, DM_CHANNEL_ID, BOT_USER_ID } = require('./config.json');
 
 // Create a new client instance
-const client = new Client({ 
-	intents: [GatewayIntentBits.Guilds, 'DirectMessages', 'GuildMessages', GatewayIntentBits.MessageContent], 
-	partials: [Partials.Channel] });
+const client = new Client({
+	intents: [GatewayIntentBits.Guilds, 'DirectMessages', 'GuildMessages', GatewayIntentBits.MessageContent],
+	partials: [Partials.Channel]
+});
 
 client.commands = new Collection();
 
@@ -16,10 +17,10 @@ const commandFolders = fs.readdirSync(foldersPath); // returns array of all fold
 
 // Command handling
 for (const folder of commandFolders) {
-	const commandsPath = path.join(foldersPath, folder); 
-    // returns array of all files in each command folder
-    // filters for only .js files
-	const commandFiles = fs.readdirSync(commandsPath).filter(file => file.endsWith('.js') && !(file.startsWith('h-'))); 
+	const commandsPath = path.join(foldersPath, folder);
+	// returns array of all files in each command folder
+	// filters for only .js files
+	const commandFiles = fs.readdirSync(commandsPath).filter(file => file.endsWith('.js') && !(file.startsWith('h-')));
 	for (const file of commandFiles) {
 		const filePath = path.join(commandsPath, file);
 		const command = require(filePath);
@@ -40,7 +41,7 @@ for (const file of eventFiles) {
 	const filePath = path.join(eventsPath, file);
 	const event = require(filePath);
 	if (event.once) {
-        // client.once acts as a listener for any events triggered available in events folder
+		// client.once acts as a listener for any events triggered available in events folder
 		client.once(event.name, (...args) => event.execute(...args));
 	} else {
 		client.on(event.name, (...args) => event.execute(...args));
@@ -68,7 +69,7 @@ client.login(token);
 // 	}
 // }
 
-client.on("ready", () => {
+client.on("clientReady", () => {
 	client.user.setActivity('bass', { type: ActivityType.Playing });
 	// updateBanner('https://i.imgur.com/zuezb5Z.png'); // https://i.imgur.com/zuezb5Z.png;
 });
@@ -76,7 +77,7 @@ client.on("ready", () => {
 client.on("messageCreate", async message => {
 	if (message.author.id != BOT_USER_ID && message.channel.type == ChannelType.DM) {
 		const dmChannel = await client.channels.fetch(DM_CHANNEL_ID);
-		dmChannel.send({ content: `**${message.author.username} (ID: ${message.author.id}):**`});
+		dmChannel.send({ content: `**${message.author.username} (ID: ${message.author.id}):**` });
 		dmChannel.send({ content: message.content });
 	}
 });
