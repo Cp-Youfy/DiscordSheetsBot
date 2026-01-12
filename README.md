@@ -40,7 +40,7 @@ node deploy-commands.js
 `index.js` and `deploy-commands.js` is template code copied from the [discord.js guide](https://discordjs.guide/#before-you-begin). It's a very helpful guide!
 
 # CONSTANTS.json
-Do change: `INVITE_LINK`, `BOT_NAME`. Everything else can be kept constant. CDs are in seconds and anything above 100 is likely in milliseconds, but you can look it up based on its usage.
+Do change: `INVITE_LINK`, `BOT_NAME`. Everything else can be kept constant (you can always look up how they are used to see if you need to change them). CDs are in seconds and anything above 100 is likely in milliseconds, but you can look it up based on its usage.
 
 # config.json
 Resolves
@@ -60,7 +60,6 @@ You need to create a `config.json` file in the root directory. It is very import
 	"SHEETS_API_LINK": "<your-sheetdb-api-link>",
 	"DATABASE_USERNAME": "<your-mongodb-username>",
 	"DATABASE_PASSWORD": "<your-mongodb-password>",
-	"DATABASE_NAME": "<your-mongodb-collection-name-for-challenges>",
-	"DEFAULT_CHANNEL_LOG_ID": "<default-channel-for-sending-channel-logs>",
+	"DEFAULT_CHALLENGE_LOG_ID": "<default-channel-for-sending-channel-logs>",
 }
 ```

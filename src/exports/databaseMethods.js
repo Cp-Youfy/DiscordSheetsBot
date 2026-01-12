@@ -9,7 +9,7 @@ const { ObjectId } = require('mongodb');
 const { inlineCode } = require('discord.js');
 const { BONUS_WITHIN_TIME_LIMIT, BONUS_WITHIN_TIME_LIMIT_MULTIPLIER, FIRST_BLOOD_ADDITIONAL_POINTS } = require('./CHALLENGE_CONSTANTS.json')
 const assert = require('assert');
-const { DATABASE_USERNAME, DATABASE_PASSWORD, DEFAULT_CHANNEL_LOG_ID } = require('../config.json');
+const { DATABASE_USERNAME, DATABASE_PASSWORD, DEFAULT_CHALLENGE_LOG_ID } = require('../config.json');
 const { challengeSchema, playerSchema, flagsObtainedSchema, flagSchema, scoreboardSchema, longAnswerSchema } = require('./challengeSchemas.js');
 const { DATABASE_NAME_CHALLENGE, DATABASE_NAME_SERVER } = require('../CONSTANTS.json')
 const { serverBotAdminSchema } = require('./serverSchemas.js');
@@ -58,7 +58,7 @@ async function registerUser(discordID, name, registrationDate) {
  * @param {Number} value 
  * @param {Boolean} isLongAns 
  */
-async function createFlag(challengeID, flag, flagTitle, flagInfo, value, submissionOpenDate) { 
+async function createFlag(challengeID, flag, flagTitle, flagInfo, value, submissionOpenDate) {
     const dateCreated = new Date();
 
     // Attempts typecasting to date
@@ -78,7 +78,7 @@ async function createFlag(challengeID, flag, flagTitle, flagInfo, value, submiss
         if (err.startsWith("Flag validation failed: submissionOpenDate")) {
             return "Submission date not of correct format"
         }
-    }    
+    }
 }
 
 /**
@@ -145,7 +145,7 @@ async function createChallenge(name, organiser, startDate, duration, longAnsChan
 
         // Some params have default values but can be modified
         // it is not in the modal due to the numFields <= 5 Discord API restriction
-        const challenge = new Challenge({ name: name, organiser: organiser, startDate: inputStartDate, duration: inputDuration, isHiddenID: true, longAnsChannelID: longAnsChannelID, isOpen: false, isTargeted: false, isBonusTimeLimit: false, isFirstBlood: false, dateCreated: dateCreated, logChannelID: DEFAULT_CHANNEL_LOG_ID, puzzleMakerID: '123456789012456789' });
+        const challenge = new Challenge({ name: name, organiser: organiser, startDate: inputStartDate, duration: inputDuration, isHiddenID: true, longAnsChannelID: longAnsChannelID, isOpen: false, isTargeted: false, isBonusTimeLimit: false, isFirstBlood: false, dateCreated: dateCreated, logChannelID: DEFAULT_CHALLENGE_LOG_ID, puzzleMakerID: '123456789012456789' });
 
         // While name is not the primary key, we want to avoid duplicate names for challenges to avoid confusion
         const existingChallenge = await Challenge.find({ name: name });
@@ -158,7 +158,7 @@ async function createChallenge(name, organiser, startDate, duration, longAnsChan
     } catch (err) {
         console.log(err)
         return "Input not of correct format."
-    }    
+    }
 }
 
 /**
@@ -169,7 +169,7 @@ async function createChallenge(name, organiser, startDate, duration, longAnsChan
  * @param {String | Null} additionalInput
  * @returns {String}
  */
-async function submitFlag(flagString, challengeID, discordID, additionalInput, puzzle_id=null) {
+async function submitFlag(flagString, challengeID, discordID, additionalInput, puzzle_id = null) {
     const scoreboardPlayer = await Scoreboard.find({ challengeID: challengeID, playerID: discordID });
     if (scoreboardPlayer.length == 0) {
         const challengeIdAsObjectId = new ObjectId(challengeID)
@@ -177,18 +177,18 @@ async function submitFlag(flagString, challengeID, discordID, additionalInput, p
         if (existingChallenge.length == 0) {
             throw new Error("Challenge does not exist: Is your challenge ID correct?")
         } else {
-            throw new Error(`You have not joined the challenge. Use ${inlineCode('/challenge join ' + challengeID) } to join the challenge first.`);
+            throw new Error(`You have not joined the challenge. Use ${inlineCode('/challenge join ' + challengeID)} to join the challenge first.`);
         }
     }
 
     const challenge = await findChallenge(challengeID);
 
     // Searches with puzzle ID if necessary
-    const flagArr = await (puzzle_id === null ? 
+    const flagArr = await (puzzle_id === null ?
         Flag.find({ challengeID: challengeID, flag: flagString }) :
         Flag.find({ challengeID: challengeID, flag: flagString, _id: new ObjectId(puzzle_id) })
     );
-    
+
     if (!flagArr || (Array.isArray(flagArr) && flagArr.length === 0)) {
         return "Wrong flag";
     }
@@ -231,7 +231,7 @@ async function submitFlag(flagString, challengeID, discordID, additionalInput, p
     // Adds time limit bonus if applicable
     const dateNow = new Date()
     const withinHours = ((flag.submissionOpenDate - dateNow) / (1000 * 60 * 60) <= BONUS_WITHIN_TIME_LIMIT); // ms to hours -- checks against hour cap for bonus
-    var flagValueProc = ( challenge.isBonusTimeLimit == true && withinHours ?
+    var flagValueProc = (challenge.isBonusTimeLimit == true && withinHours ?
         flagValue * BONUS_WITHIN_TIME_LIMIT_MULTIPLIER : // if within time limit, multiply score
         flagValue
     )
@@ -239,7 +239,7 @@ async function submitFlag(flagString, challengeID, discordID, additionalInput, p
     // Adds first blood bonus if applicable
     const submissions = await FlagsObtained.find({ challengeID: challengeID, flag: flag.flag })
     const isFirstSubmission = (submissions.length == 1) // 1 for this flag submission
-    flagValueProc = ( challenge.isFirstBlood == true && isFirstSubmission == true ?
+    flagValueProc = (challenge.isFirstBlood == true && isFirstSubmission == true ?
         flagValueProc + FIRST_BLOOD_ADDITIONAL_POINTS :
         flagValueProc
     )
@@ -256,7 +256,7 @@ async function submitFlag(flagString, challengeID, discordID, additionalInput, p
 
 async function addPoints(pointsToAdd, challengeID, playerID) {
     const points = Number(pointsToAdd);
-    
+
     const scoreboardUpdateRes = await Scoreboard.findOneAndUpdate({ challengeID: challengeID, playerID: playerID }, { $inc: { scoreValue: points } });
     if (!scoreboardUpdateRes) {
         return "User is not registered for this challenge."
@@ -272,7 +272,7 @@ async function addPoints(pointsToAdd, challengeID, playerID) {
  */
 async function findSubmissions(challengeID, playerID) {
     const flagArr = await FlagsObtained.find(
-        { challengeID: challengeID, playerID: playerID }, 
+        { challengeID: challengeID, playerID: playerID },
         { flag: 1, _id: 0 }
     );
 
@@ -328,14 +328,14 @@ async function findChallenge(param) {
         } else {
             return challenge[0];
         }
-    }    
+    }
 }
 
 async function findLongAns(longAnsID) {
     try {
         const paramAsObjectId = new ObjectId(longAnsID);
         const longAnsById = await LongAnswer.findById(paramAsObjectId);
-        
+
         if (longAnsById.length == 0) {
             throw new Error('Long answer entry not found');
         } else if (longAnsById.length > 1) {
@@ -364,7 +364,7 @@ async function findFlag(param) {
     try {
         const paramAsObjectId = new ObjectId(param);
         const flagById = await Flag.findById(paramAsObjectId);
-        
+
         if (flagById.length == 0) {
             throw new Error('Flag not found');
         } else if (flagById.length > 1) {
@@ -452,7 +452,7 @@ async function addServerBotAdmin(serverID, roleID) {
         return serverBotAdminSubmission;
     } else {
         // Update existing entry
-        const serverBotAdminUpdateRes = await ServerBotAdmin.findOneAndUpdate({ serverID: serverID }, { $set: { roleID: roleID }}, { new: true });
+        const serverBotAdminUpdateRes = await ServerBotAdmin.findOneAndUpdate({ serverID: serverID }, { $set: { roleID: roleID } }, { new: true });
         // Returns the updated document
         return serverBotAdminUpdateRes;
     }
