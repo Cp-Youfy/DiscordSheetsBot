@@ -1,0 +1,15 @@
+# Use compose for development!
+services:
+  app:
+    # Build from the dockerfile
+    build: .
+
+    working_dir: /usr/src/bot
+
+    # Create a bind mount for real-time updates of code
+    volumes:
+      - ./:/usr/src/bot
+
+    # Restart the bot when it dies, but limit restarts in case of loop
+    restart: on-failure:3
+    

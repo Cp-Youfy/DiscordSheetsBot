@@ -2,12 +2,25 @@
   "name": "discordsheetsbot",
   "version": "1.0.0",
   "description": "Discord bot to update Google Sheets",
+  "keywords": [
+    "discord",
+    "googlesheets"
+  ],
+  "homepage": "https://github.com/Cp-Youfy/DiscordSheetsBot#readme",
+  "bugs": {
+    "url": "https://github.com/Cp-Youfy/DiscordSheetsBot/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Cp-Youfy/DiscordSheetsBot.git"
+  },
+  "license": "MIT",
+  "author": "cpyoufy",
+  "type": "commonjs",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "author": "cpyoufy",
-  "license": "MIT",
   "dependencies": {
     "axios": "^1.7.9",
     "chance": "^1.1.12",
@@ -17,17 +30,5 @@
     "spacetime": "^7.7.0",
     "sqlite3": "^5.1.7",
     "undici": "^6.20.1"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/Cp-Youfy/DiscordSheetsBot.git"
-  },
-  "keywords": [
-    "discord",
-    "googlesheets"
-  ],
-  "bugs": {
-    "url": "https://github.com/Cp-Youfy/DiscordSheetsBot/issues"
-  },
-  "homepage": "https://github.com/Cp-Youfy/DiscordSheetsBot#readme"
+  }
 }
