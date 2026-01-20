@@ -58,7 +58,7 @@ module.exports = {
 			messageEmbed.description = i.content;
 
 			// Check that there is an image attached
-			if (i.attachments.length > 0) {
+			if (i.attachments?.size > 0) {
 				messageEmbed.image = { 'url': Array.from(i.attachments.values())[0].url }
 			}
 
