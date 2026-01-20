@@ -17,6 +17,12 @@ module.exports = {
             .setName('messageid')
             .setDescription('Message ID of the target message (see footer)')
             .setRequired(true)
+        )
+        .addStringOption(option => option
+            .setName('title')
+            .setDescription('Title of the embed')
+            .setMaxLength(256)
+            .setRequired(true)
         ),
 
     async execute(interaction) {
@@ -27,6 +33,7 @@ module.exports = {
 
         // Retrieve the message object
         const messageId = interaction.options.getString('messageid') ?? null;
+        const title = interaction.options.getString('title') ?? null;
 
         try {
             let messageObj = await sourceChannelObj.messages.fetch(messageId);
@@ -52,6 +59,7 @@ module.exports = {
                     return;
                 }
 
+                messageEmbed.title = title
                 messageEmbed.description = i.content;
 
                 // Check that there is an image attached
