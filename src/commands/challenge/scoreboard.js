@@ -10,15 +10,15 @@ const MAX_PAGE = Math.ceil(100 / ENTRIES_PER_PAGE) - 1;
 // multi-page embeds inspired by https://github.com/Ai0796/RoboNene/blob/master/client/commands/leaderboard.js with reference to https://discordjs.guide/popular-topics/collectors.html
 module.exports = {
     cooldown: HARD_CD,
-	data: new SlashCommandBuilder()
-		.setName('scoreboard')
-		.setDescription('Display the scoreboard for a challenge')
+    data: new SlashCommandBuilder()
+        .setName('scoreboard')
+        .setDescription('Display the scoreboard for a challenge')
         .addStringOption(option =>
             option.setName('challenge')
                 .setDescription('Challenge ID or Name (case sensitive)')
                 .setRequired(true),
-            ),	
-	async execute(interaction) {
+        ),
+    async execute(interaction) {
         await interaction.deferReply();
         try {
             // Retrieve and check challengeID
@@ -43,17 +43,18 @@ module.exports = {
             for (let i = 0; i < slicedData.length; i++) {
                 // Declare the variables in each loop
                 const doc = slicedData[i]
-                
+
                 const player = await Player.findById(doc.playerID);
                 const playerName = player?.name ?? 'undefined';
                 const shownID = toShowId ? ` (${doc.playerID}) ` : ' ';
 
                 embedArr.push({
                     name: '',
-                    value: `${(i+1) + page * ENTRIES_PER_PAGE}. ${playerName}${shownID}${doc.scoreValue}\n`,
+                    value: `${(i + 1) + page * ENTRIES_PER_PAGE}. ${playerName}${shownID}${doc.scoreValue}\n`,
                     inline: false
                 })
             }
+
             var leaderboardEmbed = {
                 color: EMBED_COLOUR_GEN,
                 title: `Scoreboard of **${challenge.name}**`,
@@ -69,14 +70,14 @@ module.exports = {
             const scoreboardRes = await interaction.editReply({
                 embeds: [leaderboardEmbed],
                 components: [components],
-                fetchReply: true 
+                fetchReply: true
             });
-            
+
             // Multi-page functionality
             const buttonFilter = (i) => {
                 return (i.customId == 'prev' ||
-                i.customId == 'next') && 
-                i.user.id === interaction.user.id
+                    i.customId == 'next') &&
+                    i.user.id === interaction.user.id
             };
 
             const collector = scoreboardRes.createMessageComponentCollector({
@@ -93,7 +94,7 @@ module.exports = {
                         page -= 1;
                     };
                 };
-                
+
                 if (i.customId === 'next') {
                     // Go to the next page
                     if (page == lastPage) {
@@ -106,23 +107,23 @@ module.exports = {
                 // Start and end indexes of the array of scoreboard data
                 start = page * ENTRIES_PER_PAGE;
                 end = Math.min(start + ENTRIES_PER_PAGE, lastPage * ENTRIES_PER_PAGE + ENTRIES_PER_PAGE);
-                
+
                 // Reset slicedData and embedArr for the new leaderboard
-                slicedData =  scoreboardData.slice(start, end);
+                slicedData = scoreboardData.slice(start, end);
                 embedArr = []
 
                 // Populates scoreboardText: note forEach doesn't work with async callback function
                 for (let i = 0; i < slicedData.length; i++) {
                     // Declare the variables in each loop
                     const doc = slicedData[i]
-                    
+
                     const player = await Player.findById(doc.playerID);
                     const playerName = player?.name ?? 'undefined';
                     const shownID = toShowId ? ` (${doc.playerID}) ` : ' ';
 
                     embedArr.push({
                         name: '',
-                        value: `${(i+1) + page * ENTRIES_PER_PAGE}. ${playerName}${shownID}${doc.scoreValue}\n`,
+                        value: `${(i + 1) + page * ENTRIES_PER_PAGE}. ${playerName}${shownID}${doc.scoreValue}\n`,
                         inline: false
                     })
                 }
@@ -147,11 +148,11 @@ module.exports = {
             // Stops receiving input: Removes the buttons
             collector.on('end', async () => {
                 await interaction.editReply({
-                embeds: [leaderboardEmbed],
-                components: []
+                    embeds: [leaderboardEmbed],
+                    components: []
                 });
             })
-            
+
             return;
         } catch (err) {
             if (err.message == "Challenge not found.") {
@@ -161,5 +162,5 @@ module.exports = {
                 throw err;
             }
         }
-	},
+    },
 };

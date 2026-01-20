@@ -4,6 +4,8 @@ const path = require('node:path'); // constructs paths to access files and direc
 const { ActivityType, Client, Collection, GatewayIntentBits, Partials, ChannelType } = require('discord.js');
 const { token, DM_CHANNEL_ID, BOT_USER_ID } = require('./config.json');
 
+console.log("-- Starting up bot")
+
 // Create a new client instance
 const client = new Client({
 	intents: [GatewayIntentBits.Guilds, 'DirectMessages', 'GuildMessages', GatewayIntentBits.MessageContent],

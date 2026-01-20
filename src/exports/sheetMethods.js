@@ -10,7 +10,7 @@ const readFile = promisify(fs.readFile)
 const CACHED_SHEET = 'exports/sheetsData.json'
 const chance = new Chance();
 
-function addEntry(wordStr, definitionStr) {
+async function addEntry(wordStr, definitionStr) {
     try {
         assert(wordStr.length <= 32);
         assert(definitionStr.length <= 200);
@@ -40,7 +40,7 @@ async function getJson() {
 async function cacheJson() {
     // cache results locally to reduce number of API calls
     const res = await getJson()
-    
+
     try {
         await writeFile(CACHED_SHEET, JSON.stringify(res));
         return 'Sheets data cached successfully';
@@ -56,7 +56,7 @@ async function cacheJson() {
  */
 async function getEntry(n) {
     const data = await readFile(CACHED_SHEET)
-        .then((rawData) => JSON.parse(rawData, function(k, v) {
+        .then((rawData) => JSON.parse(rawData, function (k, v) {
             // renaming for discord embed
             if (k === "word") {
                 this.name = v;
@@ -79,8 +79,8 @@ async function getEntry(n) {
     }
 
     const resultArr = []
-    
-    const uniques = chance.unique(chance.natural, n, {min: 0, max: (dataLen - 1)});
+
+    const uniques = chance.unique(chance.natural, n, { min: 0, max: (dataLen - 1) });
 
     for (var i = 0; i < uniques.length; i++) {
         resultArr.push(data[uniques[i]])
