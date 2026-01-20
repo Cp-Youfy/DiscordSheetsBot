@@ -49,7 +49,6 @@ module.exports = {
 		});
 
 		collector.on('collect', async (i) => {
-			console.log('a')
 
 			if (i.content.length > 4096) {
 				interaction.channel.send(`<@${interaction.user.id}>, your message exceeds the character length of 4096 characters and has not been sent.`)
@@ -57,7 +56,11 @@ module.exports = {
 			}
 
 			messageEmbed.description = i.content;
-			messageEmbed.image = { 'url': Array.from(i.attachments.values())[0].url }
+
+			// Check that there is an image attached
+			if (i.attachments.length > 0) {
+				messageEmbed.image = { 'url': Array.from(i.attachments.values())[0].url }
+			}
 
 			const sentMessage = await channelObj.send({ 'embeds': [messageEmbed] });
 
