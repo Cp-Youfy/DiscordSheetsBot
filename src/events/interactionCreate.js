@@ -1,6 +1,5 @@
 const { Collection, Events, MessageFlags, PermissionsBitField, inlineCode } = require('discord.js');
-const { ADMIN_IDS, LOG_CHANNEL_ID } = require('../config.json');
-const { EASY_CD } = require('../CONSTANTS.json')
+const { EASY_CD, ADMIN_IDS } = require('../CONSTANTS.json')
 const { addEntry } = require('../exports/sheetMethods.js');
 const { createChallenge, createFlag, addServerBotAdmin, findServerBotAdmin } = require('../exports/databaseMethods.js')
 
@@ -8,7 +7,7 @@ module.exports = {
 	name: Events.InteractionCreate,
 	async execute(interaction) {
         // Logging command
-        const logChannel = await interaction.client.channels.fetch(LOG_CHANNEL_ID);
+        const logChannel = await interaction.client.channels.fetch(process.env.LOG_CHANNEL_ID);
 
         if (interaction.member != null) {
             if (interaction.commandName) {

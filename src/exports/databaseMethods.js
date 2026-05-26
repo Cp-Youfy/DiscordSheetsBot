@@ -9,14 +9,13 @@ const { ObjectId } = require('mongodb');
 const { inlineCode } = require('discord.js');
 const { BONUS_WITHIN_TIME_LIMIT, BONUS_WITHIN_TIME_LIMIT_MULTIPLIER, FIRST_BLOOD_ADDITIONAL_POINTS } = require('./CHALLENGE_CONSTANTS.json')
 const assert = require('assert');
-const { DATABASE_USERNAME, DATABASE_PASSWORD, DEFAULT_CHALLENGE_LOG_ID } = require('../config.json');
 const { challengeSchema, playerSchema, flagsObtainedSchema, flagSchema, scoreboardSchema, longAnswerSchema } = require('./challengeSchemas.js');
 const { DATABASE_NAME_CHALLENGE, DATABASE_NAME_SERVER } = require('../CONSTANTS.json')
 const { serverBotAdminSchema } = require('./serverSchemas.js');
 
 /* ------- ESTABLISH CONNECTION ------- */
-const uriChallenge = `mongodb+srv://${DATABASE_USERNAME}:${DATABASE_PASSWORD}@challenge.g4x9t.mongodb.net/${DATABASE_NAME_CHALLENGE}?retryWrites=true&w=majority&appName=challenge`;
-const uriServer = `mongodb+srv://${DATABASE_USERNAME}:${DATABASE_PASSWORD}@challenge.g4x9t.mongodb.net/${DATABASE_NAME_SERVER}?retryWrites=true&w=majority&appName=challenge`;
+const uriChallenge = `mongodb+srv://${process.env.DATABASE_USERNAME}:${process.env.DATABASE_PASSWORD}@challenge.g4x9t.mongodb.net/${process.env.DATABASE_NAME_CHALLENGE}?retryWrites=true&w=majority&appName=challenge`;
+const uriServer = `mongodb+srv://${process.env.DATABASE_USERNAME}:${process.env.DATABASE_PASSWORD}@challenge.g4x9t.mongodb.net/${process.env.DATABASE_NAME_SERVER}?retryWrites=true&w=majority&appName=challenge`;
 
 const challengeConnection = mongoose.createConnection(uriChallenge);
 const serverConnection = mongoose.createConnection(uriServer);

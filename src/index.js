@@ -2,7 +2,8 @@
 const fs = require('node:fs'); // identify command files
 const path = require('node:path'); // constructs paths to access files and directories
 const { ActivityType, Client, Collection, GatewayIntentBits, Partials, ChannelType } = require('discord.js');
-const { token, DM_CHANNEL_ID, BOT_USER_ID } = require('./config.json');
+
+require('@dotenvx/dotenvx').config()
 
 console.log("-- Starting up bot")
 
@@ -54,11 +55,11 @@ for (const file of eventFiles) {
 client.cooldowns = new Collection();
 
 // Log in to Discord with your client's token
-client.login(token);
+client.login(process.env.token);
 
 // Setting bot details
 // const { REST, Routes, DataResolver } = require("discord.js");
-// const rest = new REST().setToken(token);
+// const rest = new REST().setToken(process.env.token);
 
 // const updateBanner = async function (bannerLink) {
 // 	try {
@@ -77,8 +78,8 @@ client.on("clientReady", () => {
 });
 
 client.on("messageCreate", async message => {
-	if (message.author.id != BOT_USER_ID && message.channel.type == ChannelType.DM) {
-		const dmChannel = await client.channels.fetch(DM_CHANNEL_ID);
+	if (message.author.id != process.env.BOT_USER_ID && message.channel.type == ChannelType.DM) {
+		const dmChannel = await client.channels.fetch(process.env.DM_CHANNEL_ID);
 		dmChannel.send({ content: `**${message.author.username} (ID: ${message.author.id}):**` });
 		dmChannel.send({ content: message.content });
 	}

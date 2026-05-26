@@ -1,6 +1,5 @@
 const { SlashCommandBuilder, ActionRowBuilder, ModalBuilder, TextInputBuilder, TextInputStyle } = require('discord.js');
-const { EASY_CD } = require('../../CONSTANTS.json');
-const { ADMIN_IDS } = require('../../config.json')
+const { EASY_CD, ADMIN_IDS } = require('../../CONSTANTS.json');
 const { findChallenge } = require('../../exports/databaseMethods.js')
 
 module.exports = {

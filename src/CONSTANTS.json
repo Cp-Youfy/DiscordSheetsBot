@@ -10,5 +10,6 @@
 	"INVITE_LINK": "https://discord.com/oauth2/authorize?client_id=1304832313556865106&permissions=8&integration_type=0&scope=bot+applications.commands",
 	"BOT_NAME": "SbiboBot",
 	"DATABASE_NAME_CHALLENGE": "challenge",
-	"DATABASE_NAME_SERVER": "server"
+	"DATABASE_NAME_SERVER": "server",
+	"ADMIN_IDS": ["674269702419382292", "654977145893814272"]
 }

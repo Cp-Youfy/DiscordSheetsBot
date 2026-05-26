@@ -11,4 +11,4 @@ RUN npm install
 COPY . /usr/src/bot
 
 # Run the bot!
-CMD ["node", "src/index.js"]
+CMD ["dotenvx", "run", "--" "node", "src/index.js"]

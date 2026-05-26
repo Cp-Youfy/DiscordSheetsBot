@@ -1,10 +1,10 @@
-const spacetime = require('spacetime')
-const assert = require('assert')
+const spacetime = require('spacetime');
+const assert = require('assert');
 
 const { SlashCommandBuilder } = require('discord.js');
 const { MEDIUM_CD } = require('../../CONSTANTS.json');
-const { SUPPORT_MSG } = require('../../exports/TEMPLATE_MESSAGES.json')
-const { addServerBotAdmin } = require('../../exports/databaseMethods.js')
+const { SUPPORT_MSG } = require('../../exports/TEMPLATE_MESSAGES.json');
+const { addServerBotAdmin } = require('../../exports/databaseMethods.js');
 
 
 module.exports = {

@@ -1,4 +1,3 @@
-const { SHEETS_API_LINK } = require('../config.json');
 const axios = require('axios');
 const assert = require('assert');
 const Chance = require('chance');
@@ -20,7 +19,7 @@ async function addEntry(wordStr, definitionStr) {
         return `Parameters not of proper format!`;
     }
 
-    axios.post(SHEETS_API_LINK, {
+    axios.post(process.env.SHEETS_API_LINK, {
         data: { // the headers of your google sheets should match the keys of this dictionary
             word: wordStr,
             definition: definitionStr
@@ -32,7 +31,7 @@ async function addEntry(wordStr, definitionStr) {
 }
 
 async function getJson() {
-    const res = await axios.get(SHEETS_API_LINK)
+    const res = await axios.get(process.env.SHEETS_API_LINK)
         .then((response) => response.data)
     return res
 }
